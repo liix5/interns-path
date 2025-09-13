@@ -34,7 +34,7 @@ export default function ProfessionFilter({
   };
 
   return (
-    <div className="flex flex-wrap  gap-2">
+    <div className="flex flex-wrap justify-center items-center  gap-2">
       {professions.map((profession) => (
         <button
           key={profession.id}
