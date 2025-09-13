@@ -21,6 +21,11 @@ export const metadata: Metadata = {
     "شارك تجربتك واقرأ تجارب الآخرين لتحديد أفضل اختيار للتدريب في سنة الامتياز.",
   keywords: [
     "Interns Path",
+    "InternsPath",
+    "Interns",
+    "Path",
+    "intern path",
+    "تجارب الامتياز",
     "تدريب",
     "الامتياز",
     "امتياز",
@@ -30,7 +35,7 @@ export const metadata: Metadata = {
     "طلاب الطب",
     "علاج وظيفي",
     "علاج طبيعي",
-    " مستشفى",
+    "مستشفى",
   ],
   authors: [{ name: "Layan", url: "https://x.com/ot_layan5" }],
   openGraph: {
