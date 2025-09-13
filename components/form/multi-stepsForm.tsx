@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useForm,
   useFormContext,
@@ -336,7 +336,14 @@ const Step2 = () => {
 
 // Step3
 const Step3 = () => {
-  const { control } = useFormContext();
+  const { control, setValue, watch } = useFormContext();
+  const text = watch("description"); // <-- now 'text' exists
+
+  useEffect(() => {
+    const saved = localStorage.getItem("description");
+    if (saved && !text) setValue("description", saved);
+  }, []);
+
   return (
     <>
       <FormField
@@ -347,7 +354,7 @@ const Step3 = () => {
             <FormLabel>الوصف</FormLabel>
             <FormControl>
               <Textarea
-                className="min-h-40"
+                className="min-h-60"
                 placeholder="تحدث عن تجربتك بالتفصيل: 
                 هل يتم تحديد أخصائي لكل طالب؟
 هل تمسك مرضى لحالك؟
@@ -359,6 +366,9 @@ const Step3 = () => {
 والمواقف والمطاعم؟
                 "
                 {...field}
+                onBlur={(e) =>
+                  localStorage.setItem("description", e.target.value)
+                }
               />
             </FormControl>
             <FormMessage />
