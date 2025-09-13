@@ -1,48 +1,54 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
+import { Profession } from "@/app/lib/definitions";
+import { useSearchParams } from "next/navigation";
 
-type ProfessionFilterProps = {
-  options: string[];
-};
-
-export default function ProfessionFilter({ options }: ProfessionFilterProps) {
-  const router = useRouter();
+export default function ProfessionFilter({
+  professions,
+  onSelect,
+}: {
+  professions: Profession[];
+  onSelect: (professions: number[]) => void;
+}) {
   const searchParams = useSearchParams();
+  const [selected, setSelected] = useState<number[]>([]);
+  const selectedProf = searchParams.get("profession");
 
-  const current = searchParams.get("profession") || "";
+  useEffect(() => {
+    setSelected(() => (selectedProf ? [Number(selectedProf)] : []));
+  }, [selectedProf]);
 
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (value) {
-      params.set("profession", value);
+  const handleSelect = (id: number) => {
+    let newSelection: number[];
+    if (selected.includes(id)) {
+      // remove if already selected
+      newSelection = selected.filter((p) => p !== id);
     } else {
-      params.delete("profession");
+      // add if not selected
+      newSelection = [id];
     }
-
-    router.push(`/?${params.toString()}`);
+    setSelected(newSelection);
+    onSelect(newSelection);
   };
 
   return (
-    <div className="flex flex-col gap-1">
-      <label htmlFor="profession" className="text-sm font-medium">
-        اختر التخصص
-      </label>
-      <select
-        id="profession"
-        value={current}
-        onChange={handleChange}
-        className="rounded-lg border border-gray-300 p-2 text-sm"
-      >
-        <option value="">الكل</option>
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
+    <div className="flex flex-wrap  gap-2">
+      {professions.map((profession) => (
+        <button
+          key={profession.id}
+          onClick={() => handleSelect(profession.id)}
+          className={cn(
+            "px-3 py-1 rounded-full text-xs md:text-sm border cursor-pointer transition-colors",
+            selected.includes(profession.id)
+              ? "bg-primary text-primary-foreground border-primary"
+              : " bg-primary/20 border border-primary/80 text-foreground/80 hover:bg-accent"
+          )}
+        >
+          {profession.name}
+        </button>
+      ))}
     </div>
   );
 }

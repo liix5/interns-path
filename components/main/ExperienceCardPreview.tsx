@@ -3,7 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { Star } from "lucide-react";
+import { Loader2, Star } from "lucide-react";
+import { useState } from "react";
 
 type Experience = {
   id: number | string;
@@ -23,6 +24,8 @@ type ExperienceCardPreviewProps = {
 export default function ExperienceCardPreview({
   experience,
 }: ExperienceCardPreviewProps) {
+  const [Loading, setLoading] = useState(false);
+
   const {
     id,
     profession,
@@ -31,7 +34,7 @@ export default function ExperienceCardPreview({
     rotation,
     tags = [],
     rating = 0,
-    experience: expText,
+    description: expText,
   } = experience;
 
   return (
@@ -39,13 +42,18 @@ export default function ExperienceCardPreview({
       className="w-full shadow-sm rounded-xl border hover:shadow-md transition"
       dir="rtl"
     >
-      {/* نفس الكود السابق */}
       <CardHeader>
         <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <span className="text-lg  font-semibold">{profession}</span>
           <div className="flex items-center gap-2 text-sm text-foreground/80">
-            <span>{place}</span> • <span>{year}</span> •{" "}
-            <span>الروتيشن {rotation}</span>
+            <span>{place}</span> •{" "}
+            <span>
+              {" "}
+              {experience.year instanceof Date
+                ? experience.year.getFullYear()
+                : experience.year}
+            </span>{" "}
+            • <span>الروتيشن {rotation}</span>
           </div>
         </CardTitle>
       </CardHeader>
@@ -87,12 +95,16 @@ export default function ExperienceCardPreview({
 
         {/* Link */}
         <div className="text-left mt-2">
-          <Link
-            href={`/experience/${id}`}
-            className=" text-primary  hover:underline text-sm font-medium"
-          >
-            اقرأ المزيد &larr;
-          </Link>
+          {Loading && <Loader2 className="animate-spin mr-auto mb-4" />}
+          {!Loading && (
+            <Link
+              onClick={() => setLoading(true)}
+              href={`/experience/${id}`}
+              className=" text-primary  hover:underline text-sm font-medium"
+            >
+              اقرأ المزيد &larr;
+            </Link>
+          )}
         </div>
       </CardContent>
     </Card>

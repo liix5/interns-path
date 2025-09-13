@@ -10,6 +10,7 @@ type ExperienceCardProps = {
 };
 
 export default function ExperienceCard({ experience }: ExperienceCardProps) {
+  console.log(experience);
   const {
     profession,
     place,
@@ -18,7 +19,6 @@ export default function ExperienceCard({ experience }: ExperienceCardProps) {
     tags = [],
     rating = 0,
     description,
-    // New optional fields
     positives: pros,
     negatives: cons,
     requirements,
@@ -34,8 +34,14 @@ export default function ExperienceCard({ experience }: ExperienceCardProps) {
         <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <span className="text-xl font-semibold">{profession}</span>
           <div className="flex items-center gap-2 text-sm text-foreground/80">
-            <span>{place}</span> • <span>{year}</span> •{" "}
-            <span>الروتيشن {rotation}</span>
+            <span>{place}</span> •{" "}
+            <span>
+              {" "}
+              {experience.year instanceof Date
+                ? experience.year.getFullYear()
+                : experience.year}
+            </span>{" "}
+            • <span>الروتيشن {rotation}</span>
           </div>
         </CardTitle>
       </CardHeader>

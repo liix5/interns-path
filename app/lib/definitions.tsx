@@ -1,6 +1,6 @@
 export type Experience = {
-  id: number;
-  profession: string;
+  id: string;
+  profession: string | number[];
   place: string;
   year: string;
   rotation: string;
@@ -13,4 +13,8 @@ export type Experience = {
   departments?: string;
   workingHours?: string;
   createdAt: string;
+};
+export type Profession = {
+  id: string;
+  name: string;
 };

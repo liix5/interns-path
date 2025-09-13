@@ -1,73 +1,55 @@
-// components/main/ExperiencesFeed.tsx
-import {
-  fetchFilteredExperiences,
-  fetchExperiencesPages,
-} from "@/app/lib/data";
+"use client";
+
 import Link from "next/link";
-import ExperienceCardPreview from "@/components/main/ExperienceCardPreview"; // 👈 نستعمل الكارد الجاهز
+import ExperienceCardPreview from "@/components/main/ExperienceCardPreview";
+import { Experience } from "@/app/lib/definitions";
+import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useFormStatus } from "react-dom";
 
 type ExperiencesFeedProps = {
-  profession?: string;
-  page?: number;
+  experiences: Experience[];
+  page: number;
+  profession: string;
+  totalPages: number;
 };
 
-export default async function ExperiencesFeed({
-  profession = "all",
-  page = 2,
+export default function ExperiencesFeed({
+  experiences,
+  page,
+  profession,
+  totalPages,
 }: ExperiencesFeedProps) {
-  // const [experiences, totalPages] = await Promise.all([
-  //   fetchFilteredExperiences(profession, page),
-  //   fetchExperiencesPages(profession),
-  // ]);
+  const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
 
-  const totalPages = 3;
+  useEffect(() => {
+    // When the component first renders or when search parameters change, set loading to true
+    // This assumes the data is fetched and passed as a prop from a parent Server Component
+    setLoading(true);
+    // You can also add a cleanup function here if needed
+  }, [searchParams]);
 
-  const experiences = [
-    {
-      id: 1,
-      profession: "العلاج الوظيفي",
-      place: "مدينة الملك فهد الطبية",
-      year: "2023",
-      rotation: "الأول",
-      tags: ["تعليمي", "ضغط عالي", "أطفال"],
-      rating: 4,
-      experience:
-        "التجربة كانت ممتازة، كان فيه تنظيم واضح لكل طالب. الأخصائيين متعاونين ويعطونك فرص تمسك حالات بنفسك. في البداية كنت متوتر لكن مع الوقت اكتسبت ثه كبيييره ونتعود ونجرب ونشوف ونحالو كل يوم يوم افضل الاخصائيين اساطيييير رهيبين كلهم ممتعين مره الان نحاول مره اخرى ة.",
-    },
-    {
-      id: 2,
-      profession: "العلاج الطبيعي",
-      place: "مستشفى الحرس الوطني",
-      year: "2022",
-      rotation: "الثاني",
-      tags: ["عظام", "أعصاب"],
-      rating: 5,
-      experience:
-        "أفضل تجربة مررت بها. البيئة تعليمية بشكل كبير وكان فيه مشرف مخصص لكل طالب. شفت حالات متنوعة بين إصابات رياضية وحالات عصبية.",
-    },
-    {
-      id: 3,
-      profession: "التخاطب",
-      place: "مستشفى الملك خالد الجامعي",
-      year: "2024",
-      rotation: "الأول",
-      tags: ["أطفال", "لغة", "نطق"],
-      rating: 3,
-      experience:
-        "كان عندي صعوبة بالبداية لأن الدوام طويل، لكن المشرفين أعطوني وقت أتعلم فيه بشكل تدريجي. شفت حالات تأخر لغوي ونطق غير سليم. قدمنا برزنتيشن جماعي.",
-    },
-  ];
+  useEffect(() => {
+    // When the `experiences` prop is updated (which means the new data has arrived),
+    // set loading to false
+    if (experiences) {
+      setLoading(false);
+    }
+  }, [experiences]);
 
   return (
     <div className="mt-8">
       {/* Cards */}
       <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {experiences.length === 0 ? (
+        {loading && <Loader2 className="animate-spin mx-auto mb-4" />}
+        {experiences?.length === 0 ? (
           <p className="col-span-full text-center text-muted-foreground">
             لا توجد تجارب متاحة
           </p>
         ) : (
-          experiences.map((exp) => (
+          experiences?.map((exp) => (
             <li key={exp.id}>
               <ExperienceCardPreview experience={exp} />
             </li>
