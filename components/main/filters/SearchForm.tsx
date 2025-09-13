@@ -2,16 +2,16 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 
 export default function SearchForm() {
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const { replace } = useRouter();
+  const pathname = usePathname();
 
-  const handleSearch = useDebouncedCallback((term: string) => {
+  const handleSearch = useDebouncedCallback((term) => {
     const params = new URLSearchParams(searchParams);
-
     params.set("page", "1");
 
     if (term) {
@@ -19,8 +19,7 @@ export default function SearchForm() {
     } else {
       params.delete("q");
     }
-
-    router.push(`/?${params.toString()}`);
+    replace(`${pathname}?${params.toString()}`);
   }, 300);
 
   return (
@@ -28,8 +27,9 @@ export default function SearchForm() {
       <input
         type="text"
         name="q"
-        defaultValue={searchParams.get("q")?.toString() || ""}
-        onChange={(e) => handleSearch(e.target.value)}
+        onChange={(e) => {
+          handleSearch(e.target.value);
+        }}
         placeholder="ابحث في التجارب..."
         className="border w-73 rounded-md px-3 py-2"
       />

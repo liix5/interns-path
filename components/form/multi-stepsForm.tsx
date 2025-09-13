@@ -347,7 +347,7 @@ const Step3 = () => {
             <FormLabel>الوصف</FormLabel>
             <FormControl>
               <Textarea
-                className="h-30"
+                className="min-h-40"
                 placeholder="تحدث عن تجربتك بالتفصيل: 
                 هل يتم تحديد أخصائي لكل طالب؟
 هل تمسك مرضى لحالك؟
@@ -356,9 +356,9 @@ const Step3 = () => {
 هل فيه متطلبات (برزنتيشن/بحث)؟
 هل يعتبرون دقيقين في اوقات الدوام والغياب؟
 أنواع الحالات اللي تشوفها؟ وكيف الغياب وإجراءاته ؟
+والمواقف والمطاعم؟
                 "
                 {...field}
-                rows={4}
               />
             </FormControl>
             <FormMessage />
@@ -372,8 +372,13 @@ const Step3 = () => {
           <FormItem dir="rtl">
             <FormLabel>الأقسام</FormLabel>
             <FormControl>
-              <Input placeholder="أقسام المستشفى مفصولة بفاصلة" {...field} />
+              <Textarea
+                className="min-h-18"
+                placeholder="أقسام المستشفى مفصولة بفاصلة"
+                {...field}
+              />
             </FormControl>
+            <FormMessage />
           </FormItem>
         )}
       />
@@ -384,7 +389,7 @@ const Step3 = () => {
           <FormItem dir="rtl">
             <FormLabel>المتطلبات </FormLabel>
             <FormControl>
-              <Input placeholder="مقابلة ستيب اختبار ... " {...field} />
+              <Input placeholder="مقابلة, ستيب, اختبار ... " {...field} />
             </FormControl>
           </FormItem>
         )}

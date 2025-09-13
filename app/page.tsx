@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowUpLeft } from "lucide-react";
 import ExperiencesFeed from "@/components/main/Experiences";
 import ExperienceCard from "@/components/Experience/ExperienceCard";
-import { fetchFilteredExperiences, fetchProfessions } from "./lib/data";
+import { fetchExperiencesPages, fetchProfessions } from "./lib/data";
 import ProfessionFilter from "@/components/main/filters/ProfessionFilter";
 import FeedFilters from "@/components/main/filters/FeedsFilters";
 import SearchForm from "@/components/main/filters/SearchForm";
 import { Suspense } from "react";
 import Loading from "./loading";
+import Pagination from "@/components/main/pagination";
 
 export default async function Home({
   searchParams,
@@ -19,17 +20,12 @@ export default async function Home({
   // await searchParams;
   const page = searchParams.page ? Number(searchParams.page) : 1;
   const profession = searchParams.profession || "all";
-  const search = searchParams.q || null;
+  const search = searchParams.q || "";
 
   console.log({ searchParams, profession, page, search });
 
   const professions = await fetchProfessions();
-
-  const { experiences, totalPages } = await fetchFilteredExperiences(
-    profession,
-    page,
-    search
-  );
+  const allPages = await fetchExperiencesPages(profession, search);
 
   return (
     <div>
@@ -59,14 +55,21 @@ export default async function Home({
           <SearchForm />
           <FeedFilters professions={professions} />
         </div>
-        <Suspense fallback={<Loading />}>
+        <Suspense key={page} fallback={<Loading />}>
           <ExperiencesFeed
+            totalPages={allPages}
             page={page}
             profession={profession}
-            experiences={experiences}
-            totalPages={totalPages}
+            search={search}
           />
         </Suspense>
+
+        {/* Pagination */}
+        {allPages >= 1 && (
+          <div className=" flex justify-center mt-4">
+            <Pagination totalPages={allPages} />
+          </div>
+        )}
       </section>
     </div>
   );

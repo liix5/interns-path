@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 5;
 
 export async function fetchProfessions(): Promise<Profession[]> {
   try {
@@ -31,7 +31,7 @@ export async function fetchFilteredExperiences(
   profession: string | null,
   page: number,
   search: string | null = null
-): Promise<{ experiences: Experience[]; totalPages: number }> {
+): Promise<{ experiences: Experience[] }> {
   const offset = (page - 1) * ITEMS_PER_PAGE;
 
   console.log({ profession, page, offset, search });
@@ -81,33 +81,49 @@ export async function fetchFilteredExperiences(
       LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset};
     `;
 
-    // Fetch total count for pagination
-    const totalCount = await sql`
-  SELECT COUNT(*) FROM experiences e
-  WHERE 1=1
-  ${
-    profession && profession !== "all"
-      ? sql`AND e.profession_id = (SELECT id FROM professions WHERE name = ${profession})`
-      : sql``
-  }
-  ${
-    search
-      ? sql`AND (e.place ILIKE ${"%" + search + "%"} OR e.description ILIKE ${
-          "%" + search + "%"
-        })`
-      : sql``
-  }
-`;
-
-    const totalPages = Math.ceil(Number(totalCount[0].count) / ITEMS_PER_PAGE);
-    console.log({ totalCount, totalPages, experiences });
-    return { experiences, totalPages };
+    return { experiences };
   } catch (err) {
     console.error("Database Error in fetchFilteredExperiences:", err);
     throw new Error("Failed to fetch experiences.");
   }
 }
 
+export async function fetchExperiencesPages(
+  profession: string | null,
+  search: string | null = null
+): Promise<number> {
+  try {
+    const result = await sql`
+      SELECT COUNT(DISTINCT e.id)
+      FROM experiences e
+      JOIN professions p ON e.profession_id = p.id
+      LEFT JOIN experience_tag et ON e.id = et.experience_id
+      LEFT JOIN tags t ON et.tag_id = t.id
+      ${
+        profession && profession !== "all"
+          ? sql`WHERE p.id = ${profession}`
+          : sql``
+      }
+      ${
+        search
+          ? profession && profession !== "all"
+            ? sql` AND (e.place ILIKE ${
+                "%" + search + "%"
+              } OR e.description ILIKE ${"%" + search + "%"})`
+            : sql`WHERE (e.place ILIKE ${
+                "%" + search + "%"
+              } OR e.description ILIKE ${"%" + search + "%"})`
+          : sql``
+      }
+    `;
+
+    const totalPages = Math.ceil(Number(result[0].count) / ITEMS_PER_PAGE);
+    return totalPages;
+  } catch (error) {
+    console.error("Database Error in fetchExperiencesPages:", error);
+    throw new Error("Failed to fetch total number of experiences.");
+  }
+}
 //fetch experience by id
 
 export async function fetchExperienceById(
@@ -146,28 +162,5 @@ export async function fetchExperienceById(
   } catch (err) {
     console.error("Database Error:", err);
     throw new Error("Failed to fetch experience by ID.");
-  }
-}
-
-export async function fetchExperiencesPages(
-  profession: string | null
-): Promise<number> {
-  try {
-    let countResult;
-    if (!profession || profession === "all") {
-      countResult = await sql`SELECT COUNT(*) FROM experiences`;
-    } else {
-      countResult = await sql`
-        SELECT COUNT(*) FROM experiences
-        WHERE profession = ${profession}
-      `;
-    }
-
-    const totalItems = Number(countResult[0].count ?? "0");
-    revalidatePath("/");
-    return Math.ceil(totalItems / ITEMS_PER_PAGE);
-  } catch (err) {
-    console.error("Database Error:", err);
-    throw new Error("Failed to fetch experiences count.");
   }
 }
