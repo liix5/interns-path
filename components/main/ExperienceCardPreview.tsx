@@ -5,17 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Loader2, Star } from "lucide-react";
 import { useState } from "react";
-
-type Experience = {
-  id: number | string;
-  profession: string;
-  place: string;
-  year: string;
-  rotation: string;
-  tags?: string[];
-  rating?: number;
-  experience: string;
-};
+import { Experience } from "@/app/lib/definitions";
 
 type ExperienceCardPreviewProps = {
   experience: Experience;

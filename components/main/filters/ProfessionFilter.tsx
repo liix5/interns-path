@@ -38,10 +38,10 @@ export default function ProfessionFilter({
       {professions.map((profession) => (
         <button
           key={profession.id}
-          onClick={() => handleSelect(profession.id)}
+          onClick={() => handleSelect(Number(profession.id))}
           className={cn(
             "px-3 py-1 rounded-full text-xs md:text-sm border cursor-pointer transition-colors",
-            selected.includes(profession.id)
+            selected.includes(Number(profession.id))
               ? "bg-primary text-primary-foreground border-primary"
               : " bg-primary/20 border border-primary/80 text-foreground/80 hover:bg-accent"
           )}

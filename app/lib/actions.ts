@@ -76,8 +76,12 @@ export async function createExperience(
         description, departments, requirements, positives, negatives, rating
       )
       VALUES (
-        ${profession_id}, ${place}, ${year}, ${rotation}, ${working_hours},
-        ${description}, ${departments}, ${requirements}, ${positives}, ${negatives}, ${rating}
+        ${profession_id}, ${place}, ${year}, ${rotation ?? null}, ${
+      working_hours ?? null
+    },
+        ${description}, ${departments ?? null}, ${
+      requirements ?? null
+    }, ${positives}, ${negatives}, ${rating}
       )
       RETURNING id
     `;

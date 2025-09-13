@@ -396,10 +396,7 @@ const Step3 = () => {
 // Step4
 const Step4 = ({ tags }: { tags: string[] }) => {
   const { control, setValue, watch } = useFormContext();
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "tags",
-  });
+
   const currentTags = watch("tags"); // Watch the tags array for real-time updates
 
   return (
@@ -487,7 +484,7 @@ const Step4 = ({ tags }: { tags: string[] }) => {
                         // Use setValue to remove the tag
                         setValue(
                           "tags",
-                          currentTags.filter((t) => t !== tag),
+                          currentTags.filter((t: string) => t !== tag),
                           { shouldDirty: true, shouldValidate: true }
                         );
                       } else {
@@ -565,11 +562,6 @@ export default function ExperienceForm({
     },
     mode: "onChange",
   });
-  // Use useFieldArray to manage the tags field
-  const { fields, append, remove } = useFieldArray({
-    control: methods.control,
-    name: "tags",
-  });
 
   const [loading, setLoading] = useState(false);
 
@@ -579,7 +571,9 @@ export default function ExperienceForm({
 
   const handleNextStep = async () => {
     const isStepValid = await trigger(
-      Object.keys(formSteps[currentStep].schema.shape)
+      Object.keys(
+        formSteps[currentStep].schema.shape
+      ) as (keyof ExperienceFormValues)[]
     );
     if (isStepValid) setCurrentStep((s) => s + 1);
   };

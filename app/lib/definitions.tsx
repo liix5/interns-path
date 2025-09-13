@@ -2,7 +2,7 @@ export type Experience = {
   id: string;
   profession: string | number[];
   place: string;
-  year: string;
+  year: Date;
   rotation: string;
   tags?: string[];
   rating?: number;
