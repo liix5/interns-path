@@ -23,7 +23,7 @@ export default function ExperienceCard({ experience }: ExperienceCardProps) {
     negatives: cons,
     requirements,
     departments,
-    workingHours,
+    working_hours,
   } = experience;
   return (
     <Card
@@ -77,17 +77,20 @@ export default function ExperienceCard({ experience }: ExperienceCardProps) {
         {/* Optional Details */}
         {requirements && (
           <p className="text-sm">
-            <span className="font-semibold">المتطلبات:</span> {requirements}
+            <span className="font-semibold text-primary ">المتطلبات:</span>{" "}
+            {requirements}
           </p>
         )}
         {departments && (
           <p className="text-sm">
-            <span className="font-semibold">الأقسام:</span> {departments}
+            <span className="font-semibold text-primary ">الأقسام:</span>{" "}
+            {departments}
           </p>
         )}
-        {workingHours && (
+        {working_hours && (
           <p className="text-sm">
-            <span className="font-semibold">أوقات الدوام:</span> {workingHours}
+            <span className="text-primary font-semibold"> ساعات العمل :</span>{" "}
+            {working_hours}
           </p>
         )}
 

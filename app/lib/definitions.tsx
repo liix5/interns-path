@@ -11,7 +11,7 @@ export type Experience = {
   negatives: string;
   requirements?: string;
   departments?: string;
-  workingHours?: string;
+  working_hours?: string;
   createdAt: string;
 };
 export type Profession = {
