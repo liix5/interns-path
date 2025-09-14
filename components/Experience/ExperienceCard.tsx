@@ -33,8 +33,8 @@ export default function ExperienceCard({ experience }: ExperienceCardProps) {
       <CardHeader>
         <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <span className="text-xl font-semibold">{profession}</span>
+          <span className=" text-sm text-foreground/80">{place}</span>
           <div className="flex items-center gap-2 text-sm text-foreground/80">
-            <span>{place}</span> •{" "}
             <span>
               {" "}
               {experience.year instanceof Date
