@@ -4,6 +4,15 @@ import { z } from "zod";
 import postgres from "postgres";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import nodemailer from "nodemailer";
+
+export async function testEnv() {
+  console.log("GMAIL_USER:", process.env.GMAIL_USER);
+  console.log("GMAIL_PASS:", process.env.GMAIL_PASS);
+  console.log("POSTGRES_URL:", process.env.POSTGRES_URL);
+}
+
+testEnv();
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
@@ -111,4 +120,56 @@ export async function createExperience(
 
   revalidatePath("/");
   redirect("/");
+}
+
+const ProfessionRequestSchema = z.object({
+  profession: z.string().min(2, "الرجاء إدخال تخصص صحيح"),
+});
+
+export type ProfessionRequestState = {
+  errors?: Record<string, string[]>;
+  message?: string | null;
+};
+
+export async function sendProfessionRequest(
+  prevState: ProfessionRequestState,
+  formData: FormData
+): Promise<ProfessionRequestState> {
+  const validatedFields = ProfessionRequestSchema.safeParse({
+    profession: formData.get("profession"),
+  });
+  testEnv();
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "⚠️ يرجى تصحيح الأخطاء وإعادة المحاولة.",
+    };
+  }
+
+  const { profession } = validatedFields.data;
+
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.GMAIL_USER, // internspath@gmail.com
+        pass: process.env.GMAIL_PASS, // App password
+      },
+    });
+
+    await transporter.sendMail({
+      from: `"Interns Path" <${process.env.GMAIL_USER}>`,
+      to: "internspath@gmail.com",
+      subject: "🔔 طلب إضافة تخصص جديد",
+      text: `قام مستخدم بطلب إضافة التخصص التالي:\n\n${profession}`,
+      html: `<p>قام مستخدم بطلب إضافة التخصص التالي:</p><p><b>${profession}</b></p>`,
+    });
+
+    console.log("Profession request email sent successfully");
+  } catch (error) {
+    return { message: "❌ فشل إرسال الطلب: " + error };
+  }
+
+  return { message: " تم إرسال طلبك بنجاح!" };
 }

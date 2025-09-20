@@ -1,22 +1,38 @@
-import { Twitter, X } from "lucide-react";
+import { Mail } from "lucide-react";
+import Link from "next/link";
 
 export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="w-full  border-t bg-card py-6 ">
-      <div className="container mx-auto flex flex-col  items-center justify-between text-sm text-foreground/80">
-        <p>{year} Interns Path© </p>
-        <br />
-        <div className="flex gap-1">
-          من تصميم وتطوير{" "}
+    <footer className="w-full border-t bg-card py-6">
+      <div className="container mx-auto flex flex-col items-center justify-between text-sm text-foreground/80 gap-4">
+        {/* Year + Brand */}
+        <p>{year} Interns Path©</p>
+
+        {/* Contact Email */}
+        <div className="flex text-xs gap-1">
+          <span>تواصل معنا: </span>
+
+          <Link
+            href="mailto:internspath@gmail.com"
+            className="flex items-center gap-1 hover:text-primary"
+          >
+            internspath@gmail.com
+            <Mail className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {/* Designer credit */}
+        <div className="flex text-xs gap-1">
+          تصميم وتطوير{" "}
           <a
             href="https://x.com/ot_layan5"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium hover:text-primary flex items-center  "
+            className="font-medium hover:text-primary flex items-center gap-1"
           >
-            <span>ot_layan5@</span>
+            <span>@ot_layan5</span>
             <XIcon className="w-3 h-3" />
           </a>
         </div>
@@ -24,6 +40,7 @@ export default function Footer() {
     </footer>
   );
 }
+
 function XIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg

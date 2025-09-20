@@ -54,6 +54,8 @@ import { ChevronsUpDown, Check, Star, Loader2 } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { createExperience } from "@/app/lib/actions";
 import { fetchProfessions } from "@/app/lib/data";
+import Link from "next/link";
+import { ProfessionRequestForm } from "./professionReqForm";
 
 // ---------------- Zod Schemas ----------------
 const step1Schema = z.object({
@@ -195,6 +197,9 @@ const Step1 = ({ professions }: { professions: any[] }) => {
               </PopoverContent>
             </Popover>
             <FormMessage />
+            <p className="text-sm">
+              لم تجد تخصصك؟ <ProfessionRequestForm />
+            </p>
           </FormItem>
         )}
       />

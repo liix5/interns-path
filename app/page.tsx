@@ -29,9 +29,9 @@ export default async function Home({
 
   return (
     <div>
-      <section className="py-11 mx-8 my-3">
+      <section className="py-11 items-center flex justify-center mx-8 my-3">
         <div className="container">
-          <div className="flex flex-col items-center text-center ">
+          <div className="flex flex-col items-center justify-center text-center ">
             <Badge variant="outline">
               حدد طريقك الان <ArrowUpLeft className="mr-2 size-4" />
             </Badge>
