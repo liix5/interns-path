@@ -6,15 +6,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import nodemailer from "nodemailer";
 
-export async function testEnv() {
-  console.log("GMAIL_USER:", process.env.GMAIL_USER);
-  console.log("GMAIL_PASS:", process.env.GMAIL_PASS);
-  console.log("POSTGRES_URL:", process.env.POSTGRES_URL);
-}
-
-testEnv();
-
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+
+//development database
+// const sql = postgres(process.env.DevDB!, { ssl: "require" });
 
 const ExperienceSchema = z.object({
   profession_id: z.string().min(1, "الرجاء اختيار التخصص"),
@@ -112,14 +107,14 @@ export async function createExperience(
         `;
       }
     }
+    return { message: "✅ تم إضافة تجربتك بنجاح!" };
   } catch (error) {
+    console.error("Database Error in createExperience:", error);
+
     return {
       message: "❌ Database Error: Failed to create experience. " + error,
     };
   }
-
-  revalidatePath("/");
-  redirect("/");
 }
 
 const ProfessionRequestSchema = z.object({
@@ -138,7 +133,6 @@ export async function sendProfessionRequest(
   const validatedFields = ProfessionRequestSchema.safeParse({
     profession: formData.get("profession"),
   });
-  testEnv();
 
   if (!validatedFields.success) {
     return {

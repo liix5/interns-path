@@ -10,6 +10,7 @@ import SearchForm from "@/components/main/filters/SearchForm";
 import { Suspense } from "react";
 import Loading from "./loading";
 import Pagination from "@/components/main/pagination";
+import { ProfessionRequestForm } from "@/components/form/professionReqForm";
 
 export default async function Home({
   searchParams,
@@ -55,6 +56,9 @@ export default async function Home({
           <SearchForm />
           <FeedFilters professions={professions} />
         </div>
+        <p className="text-sm text-center">
+          لم تجد تخصصك؟ <ProfessionRequestForm />
+        </p>
         <Suspense key={page} fallback={<Loading />}>
           <ExperiencesFeed
             totalPages={allPages}

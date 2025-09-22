@@ -56,6 +56,8 @@ import { createExperience } from "@/app/lib/actions";
 import { fetchProfessions } from "@/app/lib/data";
 import Link from "next/link";
 import { ProfessionRequestForm } from "./professionReqForm";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 // ---------------- Zod Schemas ----------------
 const step1Schema = z.object({
@@ -86,31 +88,6 @@ const formSchema = step1Schema
   .merge(step2Schema)
   .merge(step3Schema)
   .merge(step4Schema);
-
-// ---------------- Fake Data ----------------
-
-const allTags = [
-  { id: "1", name: "عمل جماعي" },
-  { id: "2", name: "بيئة داعمة" },
-  { id: "3", name: "ضغط عمل عالٍ" },
-  { id: "4", name: "فرص للتعلم" },
-];
-
-const ratings = [
-  { value: "1", label: "⭐" },
-  { value: "2", label: "⭐⭐" },
-  { value: "3", label: "⭐⭐⭐" },
-  { value: "4", label: "⭐⭐⭐⭐" },
-  { value: "5", label: "⭐⭐⭐⭐⭐" },
-];
-const tagOptions = [
-  "تنظيم ممتاز",
-  "ضغط عالي",
-  "تعليمي",
-  "دوام مرن",
-  "قلة ترتيب",
-  "فرص تدريب",
-];
 
 // Helpers
 const generateYears = () => {
@@ -345,9 +322,21 @@ const Step3 = () => {
   const text = watch("description"); // <-- now 'text' exists
 
   useEffect(() => {
+    // Restore saved value once on mount
     const saved = localStorage.getItem("description");
-    if (saved && !text) setValue("description", saved);
-  }, []);
+    if (saved && !text) {
+      setValue("description", saved);
+    }
+
+    // Clear storage every 30 minutes (1800000 ms)
+    const interval = setInterval(() => {
+      localStorage.removeItem("description");
+      console.log("LocalStorage cleared");
+    }, 30 * 60 * 1000);
+
+    // Cleanup on unmount
+    return () => clearInterval(interval);
+  }, [setValue, text]);
 
   return (
     <>
@@ -580,7 +569,7 @@ export default function ExperienceForm({
       rating: 0,
       tags: [] as string[],
     },
-    mode: "onChange",
+    mode: "onSubmit",
   });
 
   const [loading, setLoading] = useState(false);
@@ -588,6 +577,10 @@ export default function ExperienceForm({
   const { trigger, handleSubmit } = methods;
   const CurrentComponent = formSteps[currentStep].component;
   const isFinalStep = currentStep === formSteps.length - 1;
+
+  // useEffect(() => {
+  //   window.scrollTo({ top: 0, behavior: "smooth" });
+  // }, [currentStep]);
 
   const handleNextStep = async () => {
     const isStepValid = await trigger(
@@ -600,9 +593,12 @@ export default function ExperienceForm({
 
   const handlePrevStep = () => setCurrentStep((s) => s - 1);
 
+  const router = useRouter();
+
   const onSubmit = async (data: any) => {
     setLoading(true);
     const formData = new FormData();
+
     Object.entries(data).forEach(([key, value]) => {
       if (Array.isArray(value)) {
         value.forEach((v) => formData.append(key, v));
@@ -611,8 +607,28 @@ export default function ExperienceForm({
       }
     });
 
-    await createExperience({}, formData);
-    setLoading(false);
+    try {
+      const res = await createExperience({}, formData);
+      console.log({ res });
+
+      if (res?.message) {
+        if (res.message.includes("❌")) {
+          toast.error(res.message, { richColors: true });
+        } else {
+          toast.success(res.message, { richColors: true });
+          methods.reset(); // ✅ clear form after success
+          setCurrentStep(0); // ✅ reset to step 1 if you want
+        }
+        router.push("/");
+      } else {
+        toast.error("حدث خطأ غير متوقع", { richColors: true });
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("تعذر إرسال التجربة" + err, { richColors: true });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

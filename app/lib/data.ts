@@ -5,6 +5,9 @@ import { revalidatePath } from "next/cache";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
+//development database
+// const sql = postgres(process.env.DevDB!, { ssl: "require" });
+
 const ITEMS_PER_PAGE = 5;
 
 export async function fetchProfessions(): Promise<Profession[]> {
@@ -33,8 +36,6 @@ export async function fetchFilteredExperiences(
   search: string | null = null
 ): Promise<{ experiences: Experience[] }> {
   const offset = (page - 1) * ITEMS_PER_PAGE;
-
-  console.log({ profession, page, offset, search });
 
   try {
     // Collect conditions as an array of SQL fragments

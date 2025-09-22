@@ -33,9 +33,13 @@ export function ProfessionRequestForm() {
   useEffect(() => {
     if (state?.message) {
       if (state.message.startsWith("❌")) {
-        toast.error(state.message);
+        toast.error(state.message, {
+          richColors: true,
+        });
       } else {
-        toast.success(state.message);
+        toast.success(state.message, {
+          richColors: true,
+        });
         setOpen(false); // ✅ close dialog
       }
     }
