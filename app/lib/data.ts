@@ -8,7 +8,7 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 //development database
 // const sql = postgres(process.env.DevDB!, { ssl: "require" });
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 30;
 
 export async function fetchProfessions(): Promise<Profession[]> {
   try {

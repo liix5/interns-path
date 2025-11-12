@@ -23,8 +23,6 @@ export default async function Home({
   const profession = searchParams.profession || "all";
   const search = searchParams.q || "";
 
-  console.log({ searchParams, profession, page, search });
-
   const professions = await fetchProfessions();
   const allPages = await fetchExperiencesPages(profession, search);
 

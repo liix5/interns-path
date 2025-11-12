@@ -29,7 +29,7 @@ export default function ExperienceCardPreview({
 
   return (
     <Card
-      className="w-full shadow-sm rounded-xl border hover:shadow-md transition"
+      className="w-full relative h-full shadow-sm rounded-xl border hover:shadow-md transition"
       dir="rtl"
     >
       <CardHeader>
@@ -84,7 +84,7 @@ export default function ExperienceCardPreview({
         </p>
 
         {/* Link */}
-        <div className="text-left mt-2">
+        <div className=" absolute bottom-5 left-5">
           {Loading && <Loader2 className="animate-spin mr-auto mb-4" />}
           {!Loading && (
             <Link
@@ -92,7 +92,8 @@ export default function ExperienceCardPreview({
               href={`/experience/${id}`}
               className=" text-primary  hover:underline text-sm font-medium"
             >
-              اقرأ المزيد &larr;
+              اقرأ المزيد
+              <span className=" pt-2">&larr;</span>
             </Link>
           )}
         </div>
