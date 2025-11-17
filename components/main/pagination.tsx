@@ -7,8 +7,6 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { generatePagination } from "@/app/lib/utils";
 
 export default function Pagination({ totalPages }: { totalPages: number }) {
-  // NOTE: Uncomment this code in Chapter 11
-
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -22,8 +20,6 @@ export default function Pagination({ totalPages }: { totalPages: number }) {
 
   return (
     <>
-      {/*  NOTE: Uncomment this code in Chapter 11 */}
-
       <div className="inline-flex">
         <PaginationArrow
           direction="left"

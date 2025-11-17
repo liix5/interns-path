@@ -1,14 +1,11 @@
-// This is required to make the component a Client Component
 "use client";
 
 import { ModeToggle } from "@/components/modeToggle";
 import React from "react";
 import { Button } from "../ui/button";
-// Import the Next.js hook
 import { usePathname } from "next/navigation";
 
 export default function NavBar() {
-  // Get the current URL pathname
   const pathname = usePathname();
 
   return (

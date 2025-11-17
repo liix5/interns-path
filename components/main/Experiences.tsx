@@ -1,9 +1,5 @@
-import Link from "next/link";
 import ExperienceCardPreview from "@/components/main/ExperienceCardPreview";
-import { Experience } from "@/app/lib/definitions";
-import { Loader2 } from "lucide-react";
 import { fetchFilteredExperiences } from "@/app/lib/data";
-import Pagination from "./pagination";
 
 type ExperiencesFeedProps = {
   page: number;

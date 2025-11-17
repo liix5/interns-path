@@ -10,7 +10,6 @@ type ExperienceCardProps = {
 };
 
 export default function ExperienceCard({ experience }: ExperienceCardProps) {
-  console.log(experience);
   const {
     profession,
     place,

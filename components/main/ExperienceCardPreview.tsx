@@ -79,7 +79,7 @@ export default function ExperienceCardPreview({
         )}
 
         {/* Experience snippet */}
-        <p className="text-sm text-foreground line-clamp-3">
+        <p className="text-sm mb-8 text-foreground line-clamp-3">
           {expText.length > 180 ? expText.slice(0, 180) + "..." : expText}
         </p>
 

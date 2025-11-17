@@ -1,4 +1,3 @@
-// app/experiences/[id]/page.tsx
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
