@@ -8,11 +8,12 @@ import nodemailer from "nodemailer";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-//development database
+// development database
 // const sql = postgres(process.env.DevDB!, { ssl: "require" });
 
 const ExperienceSchema = z.object({
   profession_id: z.string().min(1, "الرجاء اختيار التخصص"),
+  city_id: z.string().min(1, "الرجاء اختيار المدينة"),
   place: z.string().min(2, "الرجاء إدخال اسم المكان"),
   year: z.string(),
   rotation: z.string().optional(),
@@ -24,6 +25,8 @@ const ExperienceSchema = z.object({
   negatives: z.string().min(3, "السلبيات يجب أن تكون 3 أحرف على الأقل"),
   rating: z.number().min(1).max(5),
   tags: z.array(z.string()).optional(),
+  interview_info: z.string().optional(),
+  contact: z.string().optional(),
 });
 
 export type ExperienceState = {
@@ -33,10 +36,11 @@ export type ExperienceState = {
 
 export async function createExperience(
   prevState: ExperienceState,
-  formData: FormData
+  formData: FormData,
 ): Promise<ExperienceState> {
   const validatedFields = ExperienceSchema.safeParse({
     profession_id: formData.get("profession_id"),
+    city_id: formData.get("city_id"),
     place: formData.get("place"),
     year: formData.get("year"),
     rotation: formData.get("rotation"),
@@ -48,6 +52,8 @@ export async function createExperience(
     negatives: formData.get("negatives"),
     rating: Number(formData.get("rating")),
     tags: formData.getAll("tags") as string[],
+    interview_info: formData.get("interview_info"),
+    contact: formData.get("contact"),
   });
 
   if (!validatedFields.success) {
@@ -59,6 +65,7 @@ export async function createExperience(
 
   const {
     profession_id,
+    city_id,
     place,
     year,
     rotation,
@@ -70,22 +77,26 @@ export async function createExperience(
     negatives,
     rating,
     tags,
+    interview_info,
+    contact,
   } = validatedFields.data;
 
   try {
     // insert into experiences
     const [experience] = await sql`
       INSERT INTO experiences (
-        profession_id, place, year, rotation, working_hours,
-        description, departments, requirements, positives, negatives, rating
+        profession_id, city_id, place, year, rotation, working_hours,
+        description, departments, requirements, positives, negatives, rating,
+        interview_info, contact
       )
       VALUES (
-        ${profession_id}, ${place}, ${year}, ${rotation ?? null}, ${
-      working_hours ?? null
-    },
+        ${profession_id}, ${city_id}, ${place}, ${year}, ${rotation ?? null}, ${
+          working_hours ?? null
+        },
         ${description}, ${departments ?? null}, ${
-      requirements ?? null
-    }, ${positives}, ${negatives}, ${rating}
+          requirements ?? null
+        }, ${positives}, ${negatives}, ${rating},
+        ${interview_info ?? null}, ${contact ?? null}
       )
       RETURNING id
     `;
@@ -128,7 +139,7 @@ export type ProfessionRequestState = {
 
 export async function sendProfessionRequest(
   prevState: ProfessionRequestState,
-  formData: FormData
+  formData: FormData,
 ): Promise<ProfessionRequestState> {
   const validatedFields = ProfessionRequestSchema.safeParse({
     profession: formData.get("profession"),

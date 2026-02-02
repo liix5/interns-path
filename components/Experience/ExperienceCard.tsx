@@ -2,17 +2,30 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star } from "lucide-react";
+import { Star, MessageCircle, Phone, Copy } from "lucide-react";
 import { Experience } from "@/app/lib/definitions";
+import { useState } from "react";
+import { toast } from "sonner";
 
 type ExperienceCardProps = {
   experience: Experience;
 };
 
 export default function ExperienceCard({ experience }: ExperienceCardProps) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyContact = () => {
+    if (contact) {
+      navigator.clipboard.writeText(contact);
+      setCopied(true);
+      toast.success("تم نسخ معلومات التواصل");
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
   const {
     profession,
     place,
+    city,
     year,
     rotation,
     tags = [],
@@ -23,6 +36,8 @@ export default function ExperienceCard({ experience }: ExperienceCardProps) {
     requirements,
     departments,
     working_hours,
+    interview_info,
+    contact,
   } = experience;
   return (
     <Card
@@ -32,7 +47,9 @@ export default function ExperienceCard({ experience }: ExperienceCardProps) {
       <CardHeader>
         <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <span className="text-xl font-semibold">{profession}</span>
-          <span className=" text-sm text-foreground/80">{place}</span>
+          <span className=" text-sm text-foreground/80">
+            {city && `${city} - `}{place}
+          </span>
           <div className="flex items-center gap-2 text-sm text-foreground/80">
             <span>
               {" "}
@@ -98,6 +115,23 @@ export default function ExperienceCard({ experience }: ExperienceCardProps) {
           <p className="whitespace-pre-line text-foreground">{description}</p>
         </div>
 
+        {/* Interview Information */}
+        {interview_info && (
+          <div className=" bg-violet-50 border border-violet-200 p-4 rounded-xl">
+            <div className="flex items-start gap-2">
+              <MessageCircle className="h-5 w-5 text-violet-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-semibold text-violet-700 mb-2">
+                  معلومات المقابلة
+                </p>
+                <p className="text-sm text-violet-800 whitespace-pre-line">
+                  {interview_info}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Pros & Cons */}
         <div className="grid sm:grid-cols-2 gap-4">
           {pros && (
@@ -115,6 +149,32 @@ export default function ExperienceCard({ experience }: ExperienceCardProps) {
             </div>
           )}
         </div>
+
+        {/* Contact Information */}
+        {contact && (
+          <div className="bg-muted/30 border border-muted p-3 rounded-lg">
+            <div className="flex items-center gap-2">
+              <Phone className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <div className="flex-1 flex items-center justify-between gap-2">
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-0.5">
+                    للتواصل مع صاحب التجربة
+                  </p>
+                  <p className="text-sm text-foreground/80">{contact}</p>
+                </div>
+                <button
+                  onClick={handleCopyContact}
+                  className="p-1.5 hover:bg-muted rounded transition-colors"
+                  title="نسخ"
+                >
+                  <Copy
+                    className={`h-4 w-4 ${copied ? "text-primary" : "text-muted-foreground"}`}
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

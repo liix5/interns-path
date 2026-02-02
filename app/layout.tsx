@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -7,6 +6,7 @@ import Footer from "@/components/main/footer";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Toaster } from "@/components/ui/sonner";
+import { Metadata } from "next/types";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://internspath.com"), // change to your real domain
+  metadataBase: new URL("https://internspath.com"),
   title: "Interns Path",
   description:
     "شارك تجربتك واقرأ تجارب الآخرين لتحديد أفضل اختيار للتدريب في سنة الامتياز.",
@@ -40,8 +40,9 @@ export const metadata: Metadata = {
     "علاج وظيفي",
     "علاج طبيعي",
     "مستشفى",
+    "سنة الامتياز",
   ],
-  authors: [{ name: "Layan", url: "https://x.com/ot_layan5" }],
+  authors: [{ name: "Layan", url: "https://x.com/internspathSA" }],
   openGraph: {
     title: "Interns Path",
     description:
@@ -52,7 +53,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/ogInternspath.png", // مسار الصورة
+        url: "/ogInternspath.png",
         width: 1200,
         height: 630,
         alt: "Interns Path",

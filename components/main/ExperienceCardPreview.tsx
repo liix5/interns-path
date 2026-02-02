@@ -20,6 +20,7 @@ export default function ExperienceCardPreview({
     id,
     profession,
     place,
+    city,
     year,
     rotation,
     tags = [],
@@ -35,7 +36,9 @@ export default function ExperienceCardPreview({
       <CardHeader>
         <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <span className="text-lg  font-semibold">{profession}</span>
-          <span className="text-sm text-foreground/80">{place}</span>{" "}
+          <span className="text-sm text-foreground/80">
+            {city && `${city} - `}{place}
+          </span>{" "}
           <div className="flex  items-center gap-2 text-sm text-foreground/80">
             <span>
               {" "}

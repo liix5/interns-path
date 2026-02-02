@@ -15,7 +15,6 @@ export default function NavBar() {
        text-primary text-lg flex flex-col"
       >
         <a href="/">Interns Path</a>
-        <span className="text-xs text-muted-foreground/50"> نسخة اولية</span>
       </p>
       <div className="flex items-center gap-4">
         {/* Conditionally render the button based on the pathname */}

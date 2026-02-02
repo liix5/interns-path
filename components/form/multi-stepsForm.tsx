@@ -54,6 +54,7 @@ import { ChevronsUpDown, Check, Star, Loader2 } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { createExperience } from "@/app/lib/actions";
 import { fetchProfessions } from "@/app/lib/data";
+import { City } from "@/app/lib/definitions";
 import Link from "next/link";
 import { ProfessionRequestForm } from "./professionReqForm";
 import { toast } from "sonner";
@@ -62,6 +63,7 @@ import { useRouter } from "next/navigation";
 // ---------------- Zod Schemas ----------------
 const step1Schema = z.object({
   profession_id: z.number().min(1, "الرجاء اختيار التخصص"),
+  city_id: z.number().min(1, "الرجاء اختيار المدينة"),
   place: z.string().min(2, "الرجاء إدخال اسم المكان"),
 });
 
@@ -75,6 +77,7 @@ const step3Schema = z.object({
   description: z.string().min(10, "الوصف يجب أن يكون 10 أحرف على الأقل"),
   departments: z.string().min(3, "الأقسام يجب أن تكون 3 أحرف على الأقل"),
   requirements: z.string().optional(),
+  interview_info: z.string().optional(),
 });
 
 const step4Schema = z.object({
@@ -82,6 +85,7 @@ const step4Schema = z.object({
   negatives: z.string().min(3, "السلبيات يجب أن تكون 3 أحرف على الأقل"),
   tags: z.array(z.string()).optional(),
   rating: z.number().min(1, "التقييم مطلوب").max(5),
+  contact: z.string().optional(),
 });
 
 const formSchema = step1Schema
@@ -115,9 +119,10 @@ const months = [
 const years = generateYears();
 
 // ---------------- Step Components ----------------
-const Step1 = ({ professions }: { professions: any[] }) => {
+const Step1 = ({ professions, cities }: { professions: any[]; cities: City[] }) => {
   const { control } = useFormContext();
-  const [open, setOpen] = useState(false);
+  const [professionOpen, setProfessionOpen] = useState(false);
+  const [cityOpen, setCityOpen] = useState(false);
 
   return (
     <>
@@ -128,7 +133,7 @@ const Step1 = ({ professions }: { professions: any[] }) => {
         render={({ field }) => (
           <FormItem dir="rtl" className="w-full">
             <FormLabel>التخصص</FormLabel>
-            <Popover open={open} onOpenChange={setOpen}>
+            <Popover open={professionOpen} onOpenChange={setProfessionOpen}>
               <PopoverTrigger asChild>
                 <FormControl>
                   <Button
@@ -136,7 +141,7 @@ const Step1 = ({ professions }: { professions: any[] }) => {
                     role="combobox"
                     className={cn(
                       "w-full justify-between ",
-                      !field.value && "text-muted-foreground"
+                      !field.value && "text-muted-foreground",
                     )}
                   >
                     {field.value
@@ -150,21 +155,21 @@ const Step1 = ({ professions }: { professions: any[] }) => {
                 <Command>
                   <CommandInput placeholder="ابحث عن تخصص..." className="h-9" />
                   <CommandEmpty>لم يتم العثور على تخصص.</CommandEmpty>
-                  <CommandGroup>
+                  <CommandGroup className="max-h-[300px] overflow-auto">
                     {professions.map((p) => (
                       <CommandItem
                         key={p.id}
                         value={p.id}
                         onSelect={() => {
                           field.onChange(p.id);
-                          setOpen(false);
+                          setProfessionOpen(false);
                         }}
                       >
                         {p.name}
                         <Check
                           className={cn(
                             "mr-auto h-4 w-4 rtl:ml-auto rtl:mr-0",
-                            field.value === p.id ? "opacity-100" : "opacity-0"
+                            field.value === p.id ? "opacity-100" : "opacity-0",
                           )}
                         />
                       </CommandItem>
@@ -180,6 +185,65 @@ const Step1 = ({ professions }: { professions: any[] }) => {
           </FormItem>
         )}
       />
+
+      {/* City */}
+      <FormField
+        control={control}
+        name="city_id"
+        render={({ field }) => (
+          <FormItem dir="rtl" className="w-full">
+            <FormLabel>المدينة</FormLabel>
+            <Popover open={cityOpen} onOpenChange={setCityOpen}>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className={cn(
+                      "w-full justify-between",
+                      !field.value && "text-muted-foreground",
+                    )}
+                  >
+                    {field.value
+                      ? cities.find((c) => Number(c.id) === field.value)?.name_ar
+                      : "اختر المدينة"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50 rtl:mr-2 rtl:ml-0" />
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0" dir="rtl">
+                <Command>
+                  <CommandInput placeholder="ابحث عن مدينة..." className="h-9" />
+                  <CommandEmpty>لم يتم العثور على مدينة.</CommandEmpty>
+                  <CommandGroup className="max-h-[300px] overflow-auto">
+                    {cities.map((c) => (
+                      <CommandItem
+                        key={c.id}
+                        value={c.id}
+                        onSelect={() => {
+                          field.onChange(Number(c.id));
+                          setCityOpen(false);
+                        }}
+                      >
+                        {c.name_ar}
+                        <Check
+                          className={cn(
+                            "mr-auto h-4 w-4 rtl:ml-auto rtl:mr-0",
+                            field.value === Number(c.id) ? "opacity-100" : "opacity-0",
+                          )}
+                        />
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </Command>
+              </PopoverContent>
+            </Popover>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {/* Place */}
       <FormField
         control={control}
         name="place"
@@ -215,7 +279,7 @@ const Step2 = () => {
                     variant={"outline"}
                     className={cn(
                       "w-full pl-3 text-right font-normal",
-                      !field.value && "text-muted-foreground"
+                      !field.value && "text-muted-foreground",
                     )}
                   >
                     {field.value || "اختر سنة وشهر بداية تجربتك"}
@@ -234,7 +298,7 @@ const Step2 = () => {
                       field.onChange(
                         `${y || years[0]}-${newMonth
                           .toString()
-                          .padStart(2, "0")}`
+                          .padStart(2, "0")}`,
                       );
                     }}
                     value={
@@ -290,10 +354,7 @@ const Step2 = () => {
           <FormItem dir="rtl">
             <FormLabel>الروتيشن</FormLabel>
             <FormControl>
-              <Input
-                placeholder="تجربتك كانت روتيشن اول او ثاني  "
-                {...field}
-              />
+              <Input placeholder="مثال: الاول" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -329,10 +390,13 @@ const Step3 = () => {
     }
 
     // Clear storage every 30 minutes (1800000 ms)
-    const interval = setInterval(() => {
-      localStorage.removeItem("description");
-      console.log("LocalStorage cleared");
-    }, 30 * 60 * 1000);
+    const interval = setInterval(
+      () => {
+        localStorage.removeItem("description");
+        console.log("LocalStorage cleared");
+      },
+      30 * 60 * 1000,
+    );
 
     // Cleanup on unmount
     return () => clearInterval(interval);
@@ -398,6 +462,25 @@ const Step3 = () => {
           </FormItem>
         )}
       />
+      {/* Interview Information */}
+      <FormField
+        control={control}
+        name="interview_info"
+        render={({ field }) => (
+          <FormItem dir="rtl">
+            <FormLabel>معلومات المقابلة (اختياري)</FormLabel>
+            <FormControl>
+              <Textarea
+                className="max-h-40"
+                placeholder="نوعيه الاسئله المطروحه ،المواضيع التي تم التركيز عليها ... "
+                {...field}
+                rows={4}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </>
   );
 };
@@ -446,6 +529,7 @@ const Step4 = ({ tags }: { tags: string[] }) => {
           </FormItem>
         )}
       />
+
       {/* Rating */}
       <FormField
         control={control}
@@ -494,7 +578,7 @@ const Step4 = ({ tags }: { tags: string[] }) => {
                         setValue(
                           "tags",
                           currentTags.filter((t: string) => t !== tag),
-                          { shouldDirty: true, shouldValidate: true }
+                          { shouldDirty: true, shouldValidate: true },
                         );
                       } else {
                         // Use setValue to add the tag
@@ -510,6 +594,27 @@ const Step4 = ({ tags }: { tags: string[] }) => {
                 ))}
               </div>
             </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {/* Contact Information */}
+      <FormField
+        control={control}
+        name="contact"
+        render={({ field }) => (
+          <FormItem dir="rtl">
+            <FormLabel>معلومات التواصل (اختياري)</FormLabel>
+            <FormControl>
+              <Input
+                placeholder="رقم الجوال أو حساب التواصل الاجتماعي "
+                {...field}
+              />
+            </FormControl>
+            <FormDescription className="text-xs">
+              سيتمكن المستخدمون من التواصل معك لطرح الأسئلة
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
@@ -546,9 +651,11 @@ type ExperienceFormValues = z.infer<typeof formSchema>;
 
 export default function ExperienceForm({
   professions,
+  cities,
   tags,
 }: {
   professions: any[];
+  cities: City[];
   tags: string[];
 }) {
   const [currentStep, setCurrentStep] = useState(0);
@@ -557,6 +664,7 @@ export default function ExperienceForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       profession_id: 0,
+      city_id: 0,
       year: "",
       place: "",
       rotation: "",
@@ -568,6 +676,8 @@ export default function ExperienceForm({
       requirements: "",
       rating: 0,
       tags: [] as string[],
+      interview_info: "",
+      contact: "",
     },
     mode: "onSubmit",
   });
@@ -585,8 +695,8 @@ export default function ExperienceForm({
   const handleNextStep = async () => {
     const isStepValid = await trigger(
       Object.keys(
-        formSteps[currentStep].schema.shape
-      ) as (keyof ExperienceFormValues)[]
+        formSteps[currentStep].schema.shape,
+      ) as (keyof ExperienceFormValues)[],
     );
     if (isStepValid) setCurrentStep((s) => s + 1);
   };
@@ -648,7 +758,7 @@ export default function ExperienceForm({
                 <div
                   className={cn(
                     "h-1 w-full rounded-full",
-                    currentStep >= i ? " bg-primary" : "bg-gray-200"
+                    currentStep >= i ? " bg-primary" : "bg-gray-200",
                   )}
                 />
                 <span className="mt-1 text-xs block">{step.title}</span>
@@ -662,7 +772,7 @@ export default function ExperienceForm({
             <form onSubmit={handleSubmit(onSubmit)}>
               <CardContent className="space-y-6">
                 {/* Conditionally render the step component */}
-                {currentStep === 0 && <Step1 professions={professions} />}
+                {currentStep === 0 && <Step1 professions={professions} cities={cities} />}
                 {currentStep === 1 && <Step2 />}
                 {currentStep === 2 && <Step3 />}
                 {currentStep === 3 && <Step4 tags={tags} />}

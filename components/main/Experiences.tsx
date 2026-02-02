@@ -4,6 +4,7 @@ import { fetchFilteredExperiences } from "@/app/lib/data";
 type ExperiencesFeedProps = {
   page: number;
   profession: string;
+  city: string | null;
   search: string;
   totalPages: number;
 };
@@ -11,13 +12,15 @@ type ExperiencesFeedProps = {
 export default async function ExperiencesFeed({
   profession,
   page,
+  city,
   search,
   totalPages,
 }: ExperiencesFeedProps) {
   const { experiences } = await fetchFilteredExperiences(
     profession,
     page,
-    search
+    search,
+    city
   );
 
   return (

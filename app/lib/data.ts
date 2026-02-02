@@ -1,6 +1,6 @@
 // lib/data.ts
 import postgres, { Sql } from "postgres";
-import { Experience, Profession } from "./definitions";
+import { Experience, Profession, City } from "./definitions";
 import { revalidatePath } from "next/cache";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
@@ -30,20 +30,36 @@ export async function fetchTags(): Promise<string[]> {
   }
 }
 
+export async function fetchCities(): Promise<City[]> {
+  try {
+    const data = await sql<City[]>`
+      SELECT id, name_ar, name_en, region
+      FROM cities
+      ORDER BY name_ar ASC
+    `;
+    return data;
+  } catch (err) {
+    console.error("Database Error:", err);
+    throw new Error("Failed to fetch cities.");
+  }
+}
+
 export async function fetchFilteredExperiences(
   profession: string | null,
   page: number,
-  search: string | null = null
+  search: string | null = null,
+  city: string | null = null,
 ): Promise<{ experiences: Experience[] }> {
   const offset = (page - 1) * ITEMS_PER_PAGE;
 
   try {
     // Collect conditions as an array of SQL fragments
     const experiences = await sql<Experience[]>`
-      SELECT 
+      SELECT
         e.id,
         p.name AS profession,
         e.place,
+        c.name_ar AS city,
         e.year,
         e.rotation,
         e.description,
@@ -52,6 +68,8 @@ export async function fetchFilteredExperiences(
         e.requirements,
         e.departments,
         e.working_hours,
+        e.interview_info,
+        e.contact,
         e.rating,
         e.created_at,
         COALESCE(
@@ -59,6 +77,7 @@ export async function fetchFilteredExperiences(
         ) AS tags
       FROM experiences e
       JOIN professions p ON e.profession_id = p.id
+      LEFT JOIN cities c ON e.city_id = c.id
       LEFT JOIN experience_tag et ON e.id = et.experience_id
       LEFT JOIN tags t ON et.tag_id = t.id
       ${
@@ -67,8 +86,15 @@ export async function fetchFilteredExperiences(
           : sql``
       }
       ${
-        search
+        city && city !== "all"
           ? profession && profession !== "all"
+            ? sql` AND c.id = ${city}`
+            : sql`WHERE c.id = ${city}`
+          : sql``
+      }
+      ${
+        search
+          ? (profession && profession !== "all") || (city && city !== "all")
             ? sql` AND (e.place ILIKE ${
                 "%" + search + "%"
               } OR e.description ILIKE ${"%" + search + "%"})`
@@ -77,7 +103,7 @@ export async function fetchFilteredExperiences(
               } OR e.description ILIKE ${"%" + search + "%"})`
           : sql``
       }
-      GROUP BY e.id, p.id
+      GROUP BY e.id, p.id, c.id
       ORDER BY e.created_at DESC
       LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset};
     `;
@@ -91,13 +117,15 @@ export async function fetchFilteredExperiences(
 
 export async function fetchExperiencesPages(
   profession: string | null,
-  search: string | null = null
+  search: string | null = null,
+  city: string | null = null,
 ): Promise<number> {
   try {
     const result = await sql`
       SELECT COUNT(DISTINCT e.id)
       FROM experiences e
       JOIN professions p ON e.profession_id = p.id
+      LEFT JOIN cities c ON e.city_id = c.id
       LEFT JOIN experience_tag et ON e.id = et.experience_id
       LEFT JOIN tags t ON et.tag_id = t.id
       ${
@@ -106,8 +134,15 @@ export async function fetchExperiencesPages(
           : sql``
       }
       ${
-        search
+        city && city !== "all"
           ? profession && profession !== "all"
+            ? sql` AND c.id = ${city}`
+            : sql`WHERE c.id = ${city}`
+          : sql``
+      }
+      ${
+        search
+          ? (profession && profession !== "all") || (city && city !== "all")
             ? sql` AND (e.place ILIKE ${
                 "%" + search + "%"
               } OR e.description ILIKE ${"%" + search + "%"})`
@@ -128,14 +163,15 @@ export async function fetchExperiencesPages(
 //fetch experience by id
 
 export async function fetchExperienceById(
-  id: string
+  id: string,
 ): Promise<Experience | null> {
   try {
     const result = await sql`
-      SELECT 
+      SELECT
         e.id,
         p.name AS profession,
         e.place,
+        c.name_ar AS city,
         e.year,
         e.rotation,
         e.description,
@@ -144,6 +180,8 @@ export async function fetchExperienceById(
         e.requirements,
         e.departments,
         e.working_hours,
+        e.interview_info,
+        e.contact,
         e.rating,
         e.created_at,
         COALESCE(
@@ -151,10 +189,11 @@ export async function fetchExperienceById(
         ) AS tags
       FROM experiences e
       JOIN professions p ON e.profession_id = p.id
+      LEFT JOIN cities c ON e.city_id = c.id
       LEFT JOIN experience_tag et ON e.id = et.experience_id
       LEFT JOIN tags t ON et.tag_id = t.id
       WHERE e.id = ${id}
-      GROUP BY e.id, p.name;
+      GROUP BY e.id, p.name, c.name_ar;
     `;
 
     if (!result || result.length === 0) return null;
