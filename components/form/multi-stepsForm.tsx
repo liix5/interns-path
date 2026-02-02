@@ -119,7 +119,13 @@ const months = [
 const years = generateYears();
 
 // ---------------- Step Components ----------------
-const Step1 = ({ professions, cities }: { professions: any[]; cities: City[] }) => {
+const Step1 = ({
+  professions,
+  cities,
+}: {
+  professions: any[];
+  cities: City[];
+}) => {
   const { control } = useFormContext();
   const [professionOpen, setProfessionOpen] = useState(false);
   const [cityOpen, setCityOpen] = useState(false);
@@ -205,7 +211,8 @@ const Step1 = ({ professions, cities }: { professions: any[]; cities: City[] }) 
                     )}
                   >
                     {field.value
-                      ? cities.find((c) => Number(c.id) === field.value)?.name_ar
+                      ? cities.find((c) => Number(c.id) === field.value)
+                          ?.name_ar
                       : "اختر المدينة"}
                     <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50 rtl:mr-2 rtl:ml-0" />
                   </Button>
@@ -213,7 +220,10 @@ const Step1 = ({ professions, cities }: { professions: any[]; cities: City[] }) 
               </PopoverTrigger>
               <PopoverContent className="w-full p-0" dir="rtl">
                 <Command>
-                  <CommandInput placeholder="ابحث عن مدينة..." className="h-9" />
+                  <CommandInput
+                    placeholder="ابحث عن مدينة..."
+                    className="h-9"
+                  />
                   <CommandEmpty>لم يتم العثور على مدينة.</CommandEmpty>
                   <CommandGroup className="max-h-[300px] overflow-auto">
                     {cities.map((c) => (
@@ -229,7 +239,9 @@ const Step1 = ({ professions, cities }: { professions: any[]; cities: City[] }) 
                         <Check
                           className={cn(
                             "mr-auto h-4 w-4 rtl:ml-auto rtl:mr-0",
-                            field.value === Number(c.id) ? "opacity-100" : "opacity-0",
+                            field.value === Number(c.id)
+                              ? "opacity-100"
+                              : "opacity-0",
                           )}
                         />
                       </CommandItem>
@@ -651,12 +663,12 @@ type ExperienceFormValues = z.infer<typeof formSchema>;
 
 export default function ExperienceForm({
   professions,
-  cities,
   tags,
+  cities,
 }: {
   professions: any[];
-  cities: City[];
   tags: string[];
+  cities: City[];
 }) {
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -772,7 +784,9 @@ export default function ExperienceForm({
             <form onSubmit={handleSubmit(onSubmit)}>
               <CardContent className="space-y-6">
                 {/* Conditionally render the step component */}
-                {currentStep === 0 && <Step1 professions={professions} cities={cities} />}
+                {currentStep === 0 && (
+                  <Step1 professions={professions} cities={cities} />
+                )}
                 {currentStep === 1 && <Step2 />}
                 {currentStep === 2 && <Step3 />}
                 {currentStep === 3 && <Step4 tags={tags} />}
