@@ -6,8 +6,7 @@ import Footer from "@/components/main/footer";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Toaster } from "@/components/ui/sonner";
-import { Metadata } from "next/types";
-
+import type { Metadata } from "next";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -70,7 +69,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/opengraph-image.png",
+        url: "/og-internspath.png",
         width: 1200,
         height: 630,
         alt: "Interns Path",
@@ -80,9 +79,10 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Interns Path",
+    creator: "@internspathSA",
     description:
       "شارك تجربتك واقرأ تجارب الآخرين لتحديد أفضل اختيار للتدريب في سنة الامتياز.",
-    images: ["/opengraph-image.png"],
+    images: ["/og-internspath.png"],
   },
 };
 
