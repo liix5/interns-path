@@ -18,8 +18,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const OGImage = "https://internspath.com/opengraph-image.png";
-
 export const metadata: Metadata = {
   metadataBase: new URL("https://internspath.com"),
   title: "Interns Path",
@@ -72,7 +70,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: OGImage,
+        url: "/opengraph-image.png",
         width: 1200,
         height: 630,
         alt: "Interns Path",
@@ -84,7 +82,7 @@ export const metadata: Metadata = {
     title: "Interns Path",
     description:
       "شارك تجربتك واقرأ تجارب الآخرين لتحديد أفضل اختيار للتدريب في سنة الامتياز.",
-    images: [OGImage],
+    images: ["/opengraph-image.png"],
   },
 };
 
