@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const OGImage = "https://www.internspath.com/opengraph-image.png";
+const OGImage = "https://internspath.com/opengraph-image.png";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://internspath.com"),
