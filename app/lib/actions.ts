@@ -130,6 +130,7 @@ export async function createExperience(
 
 const ProfessionRequestSchema = z.object({
   profession: z.string().min(2, "الرجاء إدخال تخصص صحيح"),
+  source: z.string().optional(),
 });
 
 export type ProfessionRequestState = {
@@ -143,6 +144,7 @@ export async function sendProfessionRequest(
 ): Promise<ProfessionRequestState> {
   const validatedFields = ProfessionRequestSchema.safeParse({
     profession: formData.get("profession"),
+    source: formData.get("source"),
   });
 
   if (!validatedFields.success) {
@@ -152,7 +154,7 @@ export async function sendProfessionRequest(
     };
   }
 
-  const { profession } = validatedFields.data;
+  const { profession, source } = validatedFields.data;
 
   try {
     const transporter = nodemailer.createTransport({
@@ -166,9 +168,9 @@ export async function sendProfessionRequest(
     await transporter.sendMail({
       from: `"Interns Path" <${process.env.GMAIL_USER}>`,
       to: "internspath@gmail.com",
-      subject: "🔔 طلب إضافة تخصص جديد",
-      text: `قام مستخدم بطلب إضافة التخصص التالي:\n\n${profession}`,
-      html: `<p>قام مستخدم بطلب إضافة التخصص التالي:</p><p><b>${profession}</b></p>`,
+      subject: " طلب إضافة تخصص جديد",
+      text: `قام مستخدم بطلب إضافة التخصص التالي:\n\n${profession}\n\nمصدر الطلب: ${source || "غير محدد"}`,
+      html: `<p>قام مستخدم بطلب إضافة التخصص التالي:</p><p><b>${profession}</b></p><p><small>مصدر الطلب: ${source || "غير محدد"}</small></p>`,
     });
 
     console.log("Profession request email sent successfully");

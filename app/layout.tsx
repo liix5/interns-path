@@ -18,6 +18,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const OGImage = "https://www.internspath.com/opengraph-image.png";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://internspath.com"),
   title: "Interns Path",
@@ -41,6 +43,23 @@ export const metadata: Metadata = {
     "علاج طبيعي",
     "مستشفى",
     "سنة الامتياز",
+    "تجارب سنة الامتياز",
+    "تجارب تدريب المستشفيات",
+    "تجارب طلاب الامتياز في السعودية",
+    "تجربة تدريب علاج وظيفي",
+    "تجربة تدريب علاج طبيعي",
+    "تجربة امتياز مستشفى حكومي",
+    "تجربة امتياز مستشفى خاص",
+    "امتياز علاج وظيفي",
+    "امتياز علاج طبيعي",
+    "امتياز تمريض",
+    "امتياز طب",
+    "تجارب امتياز علاج وظيفي السعودية",
+    "تجارب تدريب صحي",
+    "أفضل مستشفى للامتياز",
+    "كيف اختار مستشفى الامتياز",
+    "تجارب امتياز حقيقية",
+    "تقييم تدريب المستشفيات",
   ],
   authors: [{ name: "Layan", url: "https://x.com/internspathSA" }],
   openGraph: {
@@ -53,7 +72,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/ogInternspath.png",
+        url: OGImage,
         width: 1200,
         height: 630,
         alt: "Interns Path",
@@ -65,7 +84,7 @@ export const metadata: Metadata = {
     title: "Interns Path",
     description:
       "شارك تجربتك واقرأ تجارب الآخرين لتحديد أفضل اختيار للتدريب في سنة الامتياز.",
-    images: ["/ogInternspath.png"], // نفس الصورة
+    images: [OGImage],
   },
 };
 

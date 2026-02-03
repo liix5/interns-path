@@ -23,7 +23,7 @@ function SubmitButton() {
   );
 }
 
-export function ProfessionRequestForm() {
+export function ProfessionRequestForm({ source }: { source: string }) {
   const [open, setOpen] = useState(false);
   const [state, formAction] = useActionState(sendProfessionRequest, {
     message: null,
@@ -64,6 +64,7 @@ export function ProfessionRequestForm() {
           onSubmit={(e) => e.stopPropagation()}
           className="space-y-4"
         >
+          <input type="hidden" name="source" value={source} />
           <Input name="profession" placeholder="اكتب تخصصك هنا" required />
           <SubmitButton />
         </form>
