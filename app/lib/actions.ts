@@ -32,6 +32,8 @@ const ExperienceSchema = z.object({
 export type ExperienceState = {
   errors?: Record<string, string[]>;
   message?: string | null;
+  experienceId?: string;
+  editToken?: string;
 };
 
 export async function createExperience(
@@ -81,13 +83,16 @@ export async function createExperience(
     contact,
   } = validatedFields.data;
 
+  // Generate unique edit token
+  const editToken = crypto.randomUUID();
+
   try {
     // insert into experiences
     const [experience] = await sql`
       INSERT INTO experiences (
         profession_id, city_id, place, year, rotation, working_hours,
         description, departments, requirements, positives, negatives, rating,
-        interview_info, contact
+        interview_info, contact, edit_token
       )
       VALUES (
         ${profession_id}, ${city_id}, ${place}, ${year}, ${rotation ?? null}, ${
@@ -96,7 +101,7 @@ export async function createExperience(
         ${description}, ${departments ?? null}, ${
           requirements ?? null
         }, ${positives}, ${negatives}, ${rating},
-        ${interview_info ?? null}, ${contact ?? null}
+        ${interview_info ?? null}, ${contact ?? null}, ${editToken}
       )
       RETURNING id
     `;
@@ -118,12 +123,141 @@ export async function createExperience(
         `;
       }
     }
-    return { message: "✅ تم إضافة تجربتك بنجاح!" };
+    return {
+      message: "✅ تم إضافة تجربتك بنجاح!",
+      experienceId: experience.id.toString(),
+      editToken: editToken,
+    };
   } catch (error) {
     console.error("Database Error in createExperience:", error);
 
     return {
       message: "❌ Database Error: Failed to create experience. " + error,
+    };
+  }
+}
+
+export async function updateExperience(
+  prevState: ExperienceState,
+  formData: FormData,
+): Promise<ExperienceState> {
+  const experienceId = formData.get("experience_id") as string;
+  const editToken = formData.get("edit_token") as string;
+
+  if (!experienceId || !editToken) {
+    return {
+      message: "❌ معرف التجربة أو رمز التعديل مفقود",
+    };
+  }
+
+  const validatedFields = ExperienceSchema.safeParse({
+    profession_id: formData.get("profession_id"),
+    city_id: formData.get("city_id"),
+    place: formData.get("place"),
+    year: formData.get("year"),
+    rotation: formData.get("rotation"),
+    working_hours: formData.get("working_hours"),
+    description: formData.get("description"),
+    departments: formData.get("departments"),
+    requirements: formData.get("requirements"),
+    positives: formData.get("positives"),
+    negatives: formData.get("negatives"),
+    rating: Number(formData.get("rating")),
+    tags: formData.getAll("tags") as string[],
+    interview_info: formData.get("interview_info"),
+    contact: formData.get("contact"),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "⚠️ يرجى تصحيح الأخطاء وإعادة المحاولة.",
+    };
+  }
+
+  const {
+    profession_id,
+    city_id,
+    place,
+    year,
+    rotation,
+    working_hours,
+    description,
+    departments,
+    requirements,
+    positives,
+    negatives,
+    rating,
+    tags,
+    interview_info,
+    contact,
+  } = validatedFields.data;
+
+  try {
+    // Verify the edit token
+    const [existingExperience] = await sql`
+      SELECT id FROM experiences
+      WHERE id = ${experienceId} AND edit_token = ${editToken}
+    `;
+
+    if (!existingExperience) {
+      return {
+        message: "❌ رمز التعديل غير صحيح أو التجربة غير موجودة",
+      };
+    }
+
+    // Update the experience
+    await sql`
+      UPDATE experiences
+      SET
+        profession_id = ${profession_id},
+        city_id = ${city_id},
+        place = ${place},
+        year = ${year},
+        rotation = ${rotation ?? null},
+        working_hours = ${working_hours ?? null},
+        description = ${description},
+        departments = ${departments ?? null},
+        requirements = ${requirements ?? null},
+        positives = ${positives},
+        negatives = ${negatives},
+        rating = ${rating},
+        interview_info = ${interview_info ?? null},
+        contact = ${contact ?? null}
+      WHERE id = ${experienceId}
+    `;
+
+    // Delete existing tags for this experience
+    await sql`
+      DELETE FROM experience_tag
+      WHERE experience_id = ${experienceId}
+    `;
+
+    // Insert new tags if provided
+    if (tags && tags.length > 0) {
+      for (const tagName of tags) {
+        const [tag] = await sql`
+          INSERT INTO tags (name)
+          VALUES (${tagName})
+          ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name
+          RETURNING id
+        `;
+
+        await sql`
+          INSERT INTO experience_tag (experience_id, tag_id)
+          VALUES (${experienceId}, ${tag.id})
+        `;
+      }
+    }
+
+    revalidatePath("/");
+    revalidatePath(`/experience/${experienceId}`);
+
+    return { message: "✅ تم تحديث تجربتك بنجاح!" };
+  } catch (error) {
+    console.error("Database Error in updateExperience:", error);
+    return {
+      message: "❌ Database Error: Failed to update experience. " + error,
     };
   }
 }

@@ -3,9 +3,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { Loader2, Star } from "lucide-react";
-import { useState } from "react";
+import { Loader2, Star, Pencil } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Experience } from "@/app/lib/definitions";
+import { Button } from "@/components/ui/button";
 
 type ExperienceCardPreviewProps = {
   experience: Experience;
@@ -15,6 +16,7 @@ export default function ExperienceCardPreview({
   experience,
 }: ExperienceCardPreviewProps) {
   const [Loading, setLoading] = useState(false);
+  const [canEdit, setCanEdit] = useState(false);
 
   const {
     id,
@@ -27,6 +29,14 @@ export default function ExperienceCardPreview({
     rating = 0,
     description: expText,
   } = experience;
+
+  useEffect(() => {
+    // Check if user has edit token for this experience
+    const editTokens = JSON.parse(
+      localStorage.getItem("experienceEditTokens") || "{}",
+    );
+    setCanEdit(!!editTokens[id]);
+  }, [id]);
 
   return (
     <Card
@@ -87,17 +97,27 @@ export default function ExperienceCardPreview({
         </p>
 
         {/* Link */}
-        <div className=" absolute bottom-5 left-5">
+        <div className="absolute bottom-5 left-5 flex gap-3 items-center">
           {Loading && <Loader2 className="animate-spin mr-auto mb-4" />}
           {!Loading && (
-            <Link
-              onClick={() => setLoading(true)}
-              href={`/experience/${id}`}
-              className=" text-primary  hover:underline text-sm font-medium"
-            >
-              اقرأ المزيد
-              <span className=" pt-2">&larr;</span>
-            </Link>
+            <>
+              <Link
+                onClick={() => setLoading(true)}
+                href={`/experience/${id}`}
+                className="text-primary hover:underline text-sm font-medium"
+              >
+                اقرأ المزيد
+                <span className="pt-2">&larr;</span>
+              </Link>
+              {canEdit && (
+                <Link href={`/experience/${id}/edit`}>
+                  <Button variant="outline" size="sm" className="gap-1">
+                    <Pencil className="h-3 w-3" />
+                    تعديل
+                  </Button>
+                </Link>
+              )}
+            </>
           )}
         </div>
       </CardContent>

@@ -204,3 +204,41 @@ export async function fetchExperienceById(
     throw new Error("Failed to fetch experience by ID.");
   }
 }
+
+export async function fetchExperienceForEdit(id: string): Promise<any | null> {
+  try {
+    const result = await sql`
+      SELECT
+        e.id,
+        e.profession_id,
+        e.city_id,
+        e.place,
+        e.year,
+        e.rotation,
+        e.description,
+        e.positives,
+        e.negatives,
+        e.requirements,
+        e.departments,
+        e.working_hours,
+        e.interview_info,
+        e.contact,
+        e.rating,
+        COALESCE(
+          json_agg(t.name) FILTER (WHERE t.id IS NOT NULL), '[]'
+        ) AS tags
+      FROM experiences e
+      LEFT JOIN experience_tag et ON e.id = et.experience_id
+      LEFT JOIN tags t ON et.tag_id = t.id
+      WHERE e.id = ${id}
+      GROUP BY e.id;
+    `;
+
+    if (!result || result.length === 0) return null;
+
+    return result[0];
+  } catch (err) {
+    console.error("Database Error:", err);
+    throw new Error("Failed to fetch experience for edit.");
+  }
+}

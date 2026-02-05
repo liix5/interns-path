@@ -1,19 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  useForm,
-  useFormContext,
-  FormProvider,
-  useFieldArray,
-} from "react-hook-form";
+import { useForm, useFormContext, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { set, z } from "zod";
+import { z } from "zod";
 import {
   Card,
   CardHeader,
   CardTitle,
-  CardDescription,
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
@@ -29,7 +23,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -52,15 +45,13 @@ import {
 } from "@/components/ui/popover";
 import { ChevronsUpDown, Check, Star, Loader2 } from "lucide-react";
 import { Badge } from "../ui/badge";
-import { createExperience } from "@/app/lib/actions";
-import { fetchProfessions } from "@/app/lib/data";
+import { updateExperience } from "@/app/lib/actions";
 import { City } from "@/app/lib/definitions";
-import Link from "next/link";
 import { ProfessionRequestForm } from "./professionReqForm";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-// ---------------- Zod Schemas ----------------
+// Schemas
 const step1Schema = z.object({
   profession_id: z.number().min(1, "الرجاء اختيار التخصص"),
   city_id: z.number().min(1, "الرجاء اختيار المدينة"),
@@ -118,7 +109,7 @@ const months = [
 ];
 const years = generateYears();
 
-// ---------------- Step Components ----------------
+// Step Components - Same as in multi-stepsForm.tsx
 const Step1 = ({
   professions,
   cities,
@@ -273,7 +264,6 @@ const Step1 = ({
   );
 };
 
-// Step2
 const Step2 = () => {
   const { control } = useFormContext();
   return (
@@ -389,31 +379,8 @@ const Step2 = () => {
   );
 };
 
-// Step3
 const Step3 = () => {
-  const { control, setValue, watch } = useFormContext();
-  const text = watch("description"); // <-- now 'text' exists
-
-  useEffect(() => {
-    // Restore saved value once on mount
-    const saved = localStorage.getItem("description");
-    if (saved && !text) {
-      setValue("description", saved);
-    }
-
-    // Clear storage every 30 minutes (1800000 ms)
-    const interval = setInterval(
-      () => {
-        localStorage.removeItem("description");
-        console.log("LocalStorage cleared");
-      },
-      30 * 60 * 1000,
-    );
-
-    // Cleanup on unmount
-    return () => clearInterval(interval);
-  }, [setValue, text]);
-
+  const { control } = useFormContext();
   return (
     <>
       <FormField
@@ -425,20 +392,8 @@ const Step3 = () => {
             <FormControl>
               <Textarea
                 className="min-h-60"
-                placeholder="تحدث عن تجربتك بالتفصيل: 
-                هل يتم تحديد أخصائي لكل طالب؟
-هل تمسك مرضى لحالك؟
-كيف تعامل الأخصائيين؟
-هل البيئة تعليمية؟
-هل فيه متطلبات (برزنتيشن/بحث)؟
-هل يعتبرون دقيقين في اوقات الدوام والغياب؟
-أنواع الحالات اللي تشوفها؟ وكيف الغياب وإجراءاته ؟
- والمواقف والمطاعم؟
-                الخ..."
+                placeholder="تحدث عن تجربتك بالتفصيل"
                 {...field}
-                onBlur={(e) =>
-                  localStorage.setItem("description", e.target.value)
-                }
               />
             </FormControl>
             <FormMessage />
@@ -474,7 +429,6 @@ const Step3 = () => {
           </FormItem>
         )}
       />
-      {/* Interview Information */}
       <FormField
         control={control}
         name="interview_info"
@@ -497,11 +451,9 @@ const Step3 = () => {
   );
 };
 
-// Step4
 const Step4 = ({ tags }: { tags: string[] }) => {
   const { control, setValue, watch } = useFormContext();
-
-  const currentTags = watch("tags"); // Watch the tags array for real-time updates
+  const currentTags = watch("tags");
 
   return (
     <>
@@ -542,7 +494,6 @@ const Step4 = ({ tags }: { tags: string[] }) => {
         )}
       />
 
-      {/* Rating */}
       <FormField
         control={control}
         name="rating"
@@ -568,10 +519,10 @@ const Step4 = ({ tags }: { tags: string[] }) => {
           </FormItem>
         )}
       />
-      {/* Tags */}
+
       <FormField
         control={control}
-        name="tags" // Keep the name for validation
+        name="tags"
         render={({ field }) => (
           <FormItem>
             <FormLabel>الوسوم</FormLabel>
@@ -586,14 +537,12 @@ const Step4 = ({ tags }: { tags: string[] }) => {
                     className="cursor-pointer"
                     onClick={() => {
                       if (currentTags.includes(tag)) {
-                        // Use setValue to remove the tag
                         setValue(
                           "tags",
                           currentTags.filter((t: string) => t !== tag),
                           { shouldDirty: true, shouldValidate: true },
                         );
                       } else {
-                        // Use setValue to add the tag
                         setValue("tags", [...currentTags, tag], {
                           shouldDirty: true,
                           shouldValidate: true,
@@ -611,7 +560,6 @@ const Step4 = ({ tags }: { tags: string[] }) => {
         )}
       />
 
-      {/* Contact Information */}
       <FormField
         control={control}
         name="contact"
@@ -635,7 +583,6 @@ const Step4 = ({ tags }: { tags: string[] }) => {
   );
 };
 
-// Steps setup
 const formSteps = [
   {
     id: "step-1",
@@ -658,66 +605,101 @@ const formSteps = [
   },
 ];
 
-// ---------------- Main Form ----------------
 type ExperienceFormValues = z.infer<typeof formSchema>;
 
-export default function ExperienceForm({
+export default function ExperienceEditForm({
+  experience,
   professions,
   tags,
   cities,
 }: {
+  experience: any;
   professions: any[];
   tags: string[];
   cities: City[];
 }) {
   const [currentStep, setCurrentStep] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [editToken, setEditToken] = useState<string | null>(null);
+  const [allowSubmit, setAllowSubmit] = useState(false);
+  const router = useRouter();
+
+  // Format year from database (handles Date object, YYYY-MM-DD, or YYYY-MM formats)
+  const formatYear = (yearValue: any) => {
+    if (!yearValue) return "";
+
+    // If it's a Date object
+    if (yearValue instanceof Date) {
+      return `${yearValue.getFullYear()}-${(yearValue.getMonth() + 1).toString().padStart(2, "0")}`;
+    }
+
+    if (typeof yearValue === "string") {
+      // If it's YYYY-MM-DD format, extract YYYY-MM
+      if (yearValue.match(/^\d{4}-\d{2}-\d{2}/)) {
+        return yearValue.slice(0, 7);
+      }
+      // If it's already in YYYY-MM format
+      if (yearValue.match(/^\d{4}-\d{2}$/)) return yearValue;
+      // Try parsing as date string
+      const date = new Date(yearValue);
+      if (!isNaN(date.getTime())) {
+        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}`;
+      }
+    }
+
+    return "";
+  };
 
   const methods = useForm<ExperienceFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      profession_id: 0,
-      city_id: 0,
-      year: "",
-      place: "",
-      rotation: "",
-      working_hours: "",
-      description: "",
-      positives: "",
-      negatives: "",
-      departments: "",
-      requirements: "",
-      rating: 0,
-      tags: [] as string[],
-      interview_info: "",
-      contact: "",
+      profession_id: experience.profession_id || 0,
+      city_id: experience.city_id || 0,
+      year: formatYear(experience.year),
+      place: experience.place || "",
+      rotation: experience.rotation || "",
+      working_hours: experience.working_hours || "",
+      description: experience.description || "",
+      positives: experience.positives || "",
+      negatives: experience.negatives || "",
+      departments: experience.departments || "",
+      requirements: experience.requirements || "",
+      rating: experience.rating || 0,
+      tags: (experience.tags || []) as string[],
+      interview_info: experience.interview_info || "",
+      contact: experience.contact || "",
     },
     mode: "onSubmit",
   });
-
-  const [loading, setLoading] = useState(false);
-  const [allowSubmit, setAllowSubmit] = useState(false);
 
   const { trigger, handleSubmit } = methods;
   const CurrentComponent = formSteps[currentStep].component;
   const isFinalStep = currentStep === formSteps.length - 1;
 
-  // Enable submit only after user has been on final step
   useEffect(() => {
-    if (isFinalStep) {
-      const timer = setTimeout(() => setAllowSubmit(true), 100);
-      return () => clearTimeout(timer);
+    // Check if user has edit token for this experience
+    const editTokens = JSON.parse(
+      localStorage.getItem("experienceEditTokens") || "{}",
+    );
+    const token = editTokens[experience.id];
+
+    if (!token) {
+      toast.error("ليس لديك صلاحية لتعديل هذه التجربة");
+      router.push(`/experience/${experience.id}`);
+      return;
     }
-  }, [isFinalStep]);
+
+    setEditToken(token);
+  }, [experience.id, router]);
 
   const handleNextStep = async () => {
-    console.log(currentStep, isFinalStep);
     const isStepValid = await trigger(
       Object.keys(
         formSteps[currentStep].schema.shape,
       ) as (keyof ExperienceFormValues)[],
     );
     if (isStepValid) {
-      setAllowSubmit(false);
+      setAllowSubmit(false); // Reset on step change
       setCurrentStep((s) => s + 1);
     }
   };
@@ -727,12 +709,32 @@ export default function ExperienceForm({
     setCurrentStep((s) => s - 1);
   };
 
-  const router = useRouter();
+  // Enable submit only after user has been on final step
+  useEffect(() => {
+    if (isFinalStep) {
+      // Small delay to prevent auto-submission on step change
+      const timer = setTimeout(() => setAllowSubmit(true), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isFinalStep]);
 
   const onSubmit = async (data: any) => {
-    if (!allowSubmit) return;
+    // Prevent accidental auto-submission when step changes
+    if (!allowSubmit) {
+      return;
+    }
+
+    if (!editToken) {
+      toast.error("رمز التعديل مفقود");
+      return;
+    }
+
     setLoading(true);
     const formData = new FormData();
+
+    // Add experience ID and edit token
+    formData.append("experience_id", experience.id);
+    formData.append("edit_token", editToken);
 
     Object.entries(data).forEach(([key, value]) => {
       if (Array.isArray(value)) {
@@ -743,106 +745,89 @@ export default function ExperienceForm({
     });
 
     try {
-      const res = await createExperience({}, formData);
-      console.log({ res });
+      const res = await updateExperience({}, formData);
 
       if (res?.message) {
         if (res.message.includes("❌")) {
           toast.error(res.message, { richColors: true });
         } else {
           toast.success(res.message, { richColors: true });
-
-          // Save edit token to localStorage
-          if (res.experienceId && res.editToken) {
-            const editTokens = JSON.parse(
-              localStorage.getItem("experienceEditTokens") || "{}",
-            );
-            editTokens[res.experienceId] = res.editToken;
-            localStorage.setItem(
-              "experienceEditTokens",
-              JSON.stringify(editTokens),
-            );
-          }
-
-          methods.reset(); // ✅ clear form after success
-          setCurrentStep(0); // ✅ reset to step 1 if you want
+          router.push(`/experience/${experience.id}`);
         }
-        router.push("/");
       } else {
         toast.error("حدث خطأ غير متوقع", { richColors: true });
       }
     } catch (err) {
       console.error(err);
-      toast.error("تعذر إرسال التجربة" + err, { richColors: true });
+      toast.error("تعذر تحديث التجربة" + err, { richColors: true });
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <main
-      dir="rtl"
-      className="w-full mt-11 flex items-center justify-center p-4"
-    >
-      <div className="w-full max-w-2xl  ">
-        <CardHeader className="flex flex-col items-center text-center">
-          <CardTitle className="text-2xl font-bold">
-            {" "}
-            أضف تجربتك في الامتياز
-          </CardTitle>
-          <div className="flex justify-between w-full my-6 text-foreground/80">
-            {formSteps.map((step, i) => (
-              <div key={step.id} className="w-1/4 text-center">
-                <div
-                  className={cn(
-                    "h-1 w-full rounded-full",
-                    currentStep >= i ? " bg-primary" : "bg-gray-200",
-                  )}
-                />
-                <span className="mt-1 text-xs block">{step.title}</span>
-              </div>
-            ))}
-          </div>
-        </CardHeader>
-
-        <FormProvider {...methods}>
-          <Form {...methods}>
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <CardContent className="space-y-6">
-                {/* Conditionally render the step component */}
-                {currentStep === 0 && (
-                  <Step1 professions={professions} cities={cities} />
-                )}
-                {currentStep === 1 && <Step2 />}
-                {currentStep === 2 && <Step3 />}
-                {currentStep === 3 && <Step4 tags={tags} />}
-              </CardContent>
-              <CardFooter className="flex mt-8 justify-between">
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={currentStep === 0}
-                  onClick={handlePrevStep}
-                >
-                  العودة
-                </Button>
-
-                {isFinalStep ? (
-                  loading ? (
-                    <Loader2 className="mr-2 animate-spin" />
-                  ) : (
-                    <Button type="submit">إرسال</Button>
-                  )
-                ) : (
-                  <Button type="button" onClick={handleNextStep}>
-                    التالي
-                  </Button>
-                )}
-              </CardFooter>
-            </form>
-          </Form>
-        </FormProvider>
+  if (!editToken) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="animate-spin h-8 w-8" />
       </div>
-    </main>
+    );
+  }
+
+  return (
+    <div className="w-full max-w-2xl">
+      <CardHeader className="flex flex-col items-center text-center">
+        <CardTitle className="text-2xl font-bold">تعديل التجربة</CardTitle>
+        <div className="flex justify-between w-full my-6 text-foreground/80">
+          {formSteps.map((step, i) => (
+            <div key={step.id} className="w-1/4 text-center">
+              <div
+                className={cn(
+                  "h-1 w-full rounded-full",
+                  currentStep >= i ? " bg-primary" : "bg-gray-200",
+                )}
+              />
+              <span className="mt-1 text-xs block">{step.title}</span>
+            </div>
+          ))}
+        </div>
+      </CardHeader>
+
+      <FormProvider {...methods}>
+        <Form {...methods}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <CardContent className="space-y-6">
+              {currentStep === 0 && (
+                <Step1 professions={professions} cities={cities} />
+              )}
+              {currentStep === 1 && <Step2 />}
+              {currentStep === 2 && <Step3 />}
+              {currentStep === 3 && <Step4 tags={tags} />}
+            </CardContent>
+            <CardFooter className="flex mt-8 justify-between">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={currentStep === 0}
+                onClick={handlePrevStep}
+              >
+                العودة
+              </Button>
+
+              {isFinalStep ? (
+                loading ? (
+                  <Loader2 className="mr-2 animate-spin" />
+                ) : (
+                  <Button type="submit">حفظ التعديلات</Button>
+                )
+              ) : (
+                <Button type="button" onClick={handleNextStep}>
+                  التالي
+                </Button>
+              )}
+            </CardFooter>
+          </form>
+        </Form>
+      </FormProvider>
+    </div>
   );
 }
