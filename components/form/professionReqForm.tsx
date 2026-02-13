@@ -17,7 +17,7 @@ import { useFormStatus } from "react-dom";
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" disabled={pending}>
+    <Button type="submit" className="w-full mx-auto" disabled={pending}>
       {pending ? "جاري الإرسال..." : "إرسال"}
     </Button>
   );
@@ -66,6 +66,9 @@ export function ProfessionRequestForm({ source }: { source: string }) {
         >
           <input type="hidden" name="source" value={source} />
           <Input name="profession" placeholder="اكتب تخصصك هنا" required />
+          <p className="text-sm text-muted-foreground">
+            شارك الموقع مع مجتمع تخصصك ليشاركوا تجاربهم
+          </p>
           <SubmitButton />
         </form>
       </DialogContent>

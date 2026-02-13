@@ -50,13 +50,14 @@ export default async function Home({
       <hr className="shadow-sm my-4" />
       <section id="experiences" className=" p-4">
         <h2 className="text-2xl text-center font-bold ">تجارب المستخدمين</h2>
-        <div className=" pt-6 justify-center mb-2 items-center flex flex-col md:flex-row gap-7">
+        <div className=" pt-6 justify-center mb-2 items-center flex flex-col md:flex-row gap-3">
           <SearchForm />
+          <p className="text-sm text-center">
+            لم تجد تخصصك؟ <ProfessionRequestForm source="الصفحة الرئيسية" />
+          </p>
           <FeedFilters professions={professions} />
         </div>
-        <p className="text-sm text-center">
-          لم تجد تخصصك؟ <ProfessionRequestForm source="الصفحة الرئيسية" />
-        </p>
+
         <Suspense key={page} fallback={<Loading />}>
           <ExperiencesFeed
             totalPages={allPages}
