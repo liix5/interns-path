@@ -52,8 +52,13 @@ export async function fetchFilteredExperiences(
 ): Promise<{ experiences: Experience[] }> {
   const offset = (page - 1) * ITEMS_PER_PAGE;
 
+  // Parse profession IDs (supports comma-separated values for multi-select)
+  const hasProfessionFilter = profession && profession !== "all";
+  const professionIds = hasProfessionFilter
+    ? profession.split(",").map(Number).filter(Boolean)
+    : [];
+
   try {
-    // Collect conditions as an array of SQL fragments
     const experiences = await sql<Experience[]>`
       SELECT
         e.id,
@@ -81,20 +86,20 @@ export async function fetchFilteredExperiences(
       LEFT JOIN experience_tag et ON e.id = et.experience_id
       LEFT JOIN tags t ON et.tag_id = t.id
       ${
-        profession && profession !== "all"
-          ? sql`WHERE p.id = ${profession}`
+        professionIds.length > 0
+          ? sql`WHERE p.id = ANY(${professionIds})`
           : sql``
       }
       ${
         city && city !== "all"
-          ? profession && profession !== "all"
+          ? professionIds.length > 0
             ? sql` AND c.id = ${city}`
             : sql`WHERE c.id = ${city}`
           : sql``
       }
       ${
         search
-          ? (profession && profession !== "all") || (city && city !== "all")
+          ? professionIds.length > 0 || (city && city !== "all")
             ? sql` AND (e.place ILIKE ${
                 "%" + search + "%"
               } OR e.description ILIKE ${"%" + search + "%"})`
@@ -120,6 +125,12 @@ export async function fetchExperiencesPages(
   search: string | null = null,
   city: string | null = null,
 ): Promise<number> {
+  // Parse profession IDs (supports comma-separated values for multi-select)
+  const hasProfessionFilter = profession && profession !== "all";
+  const professionIds = hasProfessionFilter
+    ? profession.split(",").map(Number).filter(Boolean)
+    : [];
+
   try {
     const result = await sql`
       SELECT COUNT(DISTINCT e.id)
@@ -129,20 +140,20 @@ export async function fetchExperiencesPages(
       LEFT JOIN experience_tag et ON e.id = et.experience_id
       LEFT JOIN tags t ON et.tag_id = t.id
       ${
-        profession && profession !== "all"
-          ? sql`WHERE p.id = ${profession}`
+        professionIds.length > 0
+          ? sql`WHERE p.id = ANY(${professionIds})`
           : sql``
       }
       ${
         city && city !== "all"
-          ? profession && profession !== "all"
+          ? professionIds.length > 0
             ? sql` AND c.id = ${city}`
             : sql`WHERE c.id = ${city}`
           : sql``
       }
       ${
         search
-          ? (profession && profession !== "all") || (city && city !== "all")
+          ? professionIds.length > 0 || (city && city !== "all")
             ? sql` AND (e.place ILIKE ${
                 "%" + search + "%"
               } OR e.description ILIKE ${"%" + search + "%"})`
