@@ -34,7 +34,7 @@ export default function ProfessionFilter({
   };
 
   return (
-    <div className="flex flex-wrap justify-center items-center  gap-2">
+    <div className="flex flex-wrap justify-center items-center  gap-1.5">
       {professions.map((profession) => (
         <button
           key={profession.id}
@@ -43,7 +43,7 @@ export default function ProfessionFilter({
             "px-3 py-1 rounded-full text-xs md:text-sm border cursor-pointer transition-colors",
             selected.includes(Number(profession.id))
               ? "bg-primary text-primary-foreground border-primary"
-              : " bg-primary/20 border border-primary/80 text-foreground/80 hover:bg-accent"
+              : " bg-primary/20 border border-primary/80 text-foreground/80 hover:bg-accent",
           )}
         >
           {profession.name}
@@ -52,3 +52,32 @@ export default function ProfessionFilter({
     </div>
   );
 }
+
+// {professions.map((profession, index) => {
+//   const isNew = index >= professions.length - 2; // last 2 are new
+//   return (
+//     <button
+//       key={profession.id}
+//       onClick={() => handleSelect(Number(profession.id))}
+//       className={cn(
+//         "px-3 py-1 rounded-full text-xs md:text-sm border cursor-pointer transition-all duration-300",
+//         selected.includes(Number(profession.id))
+//           ? "bg-primary text-primary-foreground border-primary"
+//           : "bg-primary/20 border border-primary/80 text-foreground/80 hover:bg-accent",
+//         isNew &&
+//           "font-bold text-white bg-primary shadow-lg hover:scale-105 hover:shadow-lg",
+//       )}
+//       style={
+//         isNew
+//           ? {
+//               boxShadow:
+//                 "0 0 15px var(--accent), 0 0 25px var(--primary)",
+//               textShadow: "0 0 8px var(--accent-foreground)",
+//             }
+//           : {}
+//       }
+//     >
+//       {profession.name}
+//     </button>
+//   );
+// })}

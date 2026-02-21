@@ -28,7 +28,7 @@ export default async function Home({
 
   return (
     <div>
-      <section className="py-11 items-center flex justify-center mx-8 my-3">
+      <section className="py-11 items-center flex justify-center mx-8 mt-3 ">
         <div className="container">
           <div className="flex flex-col items-center justify-center text-center ">
             <Badge variant="outline">
@@ -47,10 +47,10 @@ export default async function Home({
           </div>
         </div>
       </section>
-      <hr className="shadow-sm my-4" />
+      <hr className="shadow-sm my-3" />
       <section id="experiences" className=" p-4">
         <h2 className="text-2xl text-center font-bold ">تجارب المستخدمين</h2>
-        <div className=" pt-6 justify-center mb-2 items-center flex flex-col md:flex-row gap-3">
+        <div className=" pt-6 justify-center mb-2 items-center flex flex-col  gap-3">
           <SearchForm />
           <p className="text-sm text-center">
             لم تجد تخصصك؟ <ProfessionRequestForm source="الصفحة الرئيسية" />
