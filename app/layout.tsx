@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Newsreader, IBM_Plex_Sans_Arabic } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import NavBar from "@/components/main/nav";
@@ -7,19 +7,27 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+
+const inter = Inter({
+  variable: "--font-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const newsreader = Newsreader({
+  variable: "--font-serif",
   subsets: ["latin"],
+  weight: "500",
+});
+
+const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
+  variable: "--font-arabic",
+  subsets: ["arabic"],
+  weight: ["400", "600", "700"],
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://internspath.com"),
-  title: "Interns Path",
+  title: "InternsPath",
   description:
     "شارك تجربتك واقرأ تجارب الآخرين لتحديد أفضل اختيار للتدريب في سنة الامتياز.",
   keywords: [
@@ -57,32 +65,33 @@ export const metadata: Metadata = {
     "كيف اختار مستشفى الامتياز",
     "تجارب امتياز حقيقية",
     "تقييم تدريب المستشفيات",
+    "مسار الامتياز",
   ],
   authors: [{ name: "Layan", url: "https://x.com/internspathSA" }],
   openGraph: {
-    title: "Interns Path",
+    title: "InternsPath",
     description:
       "شارك تجربتك واقرأ تجارب الآخرين لتحديد أفضل اختيار للتدريب في سنة الامتياز.",
     url: "https://internspath.com",
-    siteName: "Interns Path",
+    siteName: "InternsPath",
     locale: "ar_SA",
     type: "website",
     images: [
       {
-        url: "/og-internspath.png",
+        url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "Interns Path",
+        alt: "InternsPath",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Interns Path",
+    title: "InternsPath",
     creator: "@internspathSA",
     description:
       "شارك تجربتك واقرأ تجارب الآخرين لتحديد أفضل اختيار للتدريب في سنة الامتياز.",
-    images: ["/og-internspath.png"],
+    images: ["/og.png"],
   },
 };
 
@@ -92,9 +101,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html dir="rtl" lang="en">
+    <html dir="rtl" lang="ar">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} flex flex-col min-h-screen antialiased`}
+        className={`${inter.variable} ${newsreader.variable} ${ibmPlexSansArabic.variable} flex flex-col min-h-screen antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {" "}

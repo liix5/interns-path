@@ -556,7 +556,7 @@ const Step4 = ({ tags }: { tags: string[] }) => {
                     key={i}
                     className={`h-6 w-6 cursor-pointer ${
                       i < field.value
-                        ? "text-yellow-400 fill-yellow-400"
+                        ? "text-success fill-success"
                         : "text-gray-300"
                     }`}
                     onClick={() => field.onChange(i + 1)}

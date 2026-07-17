@@ -44,7 +44,7 @@ export default function Footer() {
           <div className="w-16 h-px bg-border" />
 
           {/* Brand + Copyright */}
-          <p className="text-sm text-foreground/50">© {year} Interns Path</p>
+          <p className="text-sm text-foreground/50">© {year} InternsPath</p>
         </div>
       </div>
     </footer>

@@ -83,7 +83,7 @@ export default function ExperienceCardPreview({
                 key={i}
                 className={`h-4 w-4 ${
                   i < rating
-                    ? "text-yellow-400 fill-yellow-400"
+                    ? "text-success fill-success"
                     : "text-gray-300"
                 }`}
               />
