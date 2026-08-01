@@ -416,6 +416,10 @@ const Step3 = () => {
 
   return (
     <>
+      <div className="flex text-xs text-muted-foreground flex-col gap-2">
+        تجربتك تُنشر بدون اسمك ولا أي معلومة تعرّف بك.
+        <span className="block"> اكتب بصراحة, هذا اللي يفيد اللي بعدك.</span>
+      </div>
       <FormField
         control={control}
         name="description"
@@ -639,20 +643,20 @@ const Step4 = ({ tags }: { tags: string[] }) => {
 const formSteps = [
   {
     id: "step-1",
-    title: "المعلومات الأساسية",
+    title: "المكان والتخصص",
     schema: step1Schema,
     component: Step1,
   },
   {
     id: "step-2",
-    title: "وقت الروتيشن ",
+    title: "التوقيت والدوام",
     schema: step2Schema,
     component: Step2,
   },
-  { id: "step-3", title: "الوصف", schema: step3Schema, component: Step3 },
+  { id: "step-3", title: "تجربتك", schema: step3Schema, component: Step3 },
   {
     id: "step-4",
-    title: "تفاصيل إضافية",
+    title: "خلاصة التجربة",
     schema: step4Schema,
     component: Step4,
   },

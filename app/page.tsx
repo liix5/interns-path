@@ -38,8 +38,8 @@ export default async function Home({
               شارك تجربتك وحدد طريقك
             </h1>
             <p className="text-muted-foreground mb-8 max-w-xl lg:text-xl">
-              شارك تجربتك واقرا تجارب الاخرين لتحدد الاختيار الافضل للتدريب في
-              سنه الامتياز
+              تجربتك تصنع الفرق، شاركها، واستفد من تجارب الآخرين في مسار
+              الامتياز
             </p>
             <Button asChild className="w-full justify-center max-w-lg">
               <a href="/experience-form"> شارك تجربتك</a>
@@ -49,7 +49,7 @@ export default async function Home({
       </section>
       <hr className="shadow-sm my-3" />
       <section id="experiences" className=" p-4">
-        <h2 className="text-2xl text-center font-bold ">تجارب المستخدمين</h2>
+        <h2 className="text-2xl text-center font-bold ">أحدث التجارب</h2>
         <div className=" pt-6 justify-center mb-2 items-center flex flex-col  gap-3">
           <SearchForm />
           <p className="text-sm text-center">

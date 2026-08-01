@@ -27,7 +27,7 @@ const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://internspath.com"),
-  title: "InternsPath",
+  title: "InternsPath | مسار الامتياز",
   description:
     "شارك تجربتك واقرأ تجارب الآخرين لتحديد أفضل اختيار للتدريب في سنة الامتياز.",
   keywords: [
@@ -69,7 +69,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Layan", url: "https://x.com/internspathSA" }],
   openGraph: {
-    title: "InternsPath",
+    title: "InternsPath | مسار الامتياز",
     description:
       "شارك تجربتك واقرأ تجارب الآخرين لتحديد أفضل اختيار للتدريب في سنة الامتياز.",
     url: "https://internspath.com",
@@ -87,7 +87,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "InternsPath",
+    title: "InternsPath | مسار الامتياز",
     creator: "@internspathSA",
     description:
       "شارك تجربتك واقرأ تجارب الآخرين لتحديد أفضل اختيار للتدريب في سنة الامتياز.",
