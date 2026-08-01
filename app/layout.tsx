@@ -101,7 +101,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html dir="rtl" lang="ar">
+    <html dir="rtl" lang="ar" className="scroll-smooth">
       <body
         className={`${inter.variable} ${newsreader.variable} ${ibmPlexSansArabic.variable} flex flex-col min-h-screen antialiased`}
       >

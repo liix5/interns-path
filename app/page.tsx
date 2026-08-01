@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowUpLeft } from "lucide-react";
+import { ArrowDown, ArrowUpLeft } from "lucide-react";
 import ExperiencesFeed from "@/components/main/Experiences";
 import ExperienceCard from "@/components/Experience/ExperienceCard";
 import { fetchExperiencesPages, fetchProfessions } from "./lib/data";
@@ -38,17 +38,28 @@ export default async function Home({
               شارك تجربتك وحدد طريقك
             </h1>
             <p className="text-muted-foreground mb-8 max-w-xl lg:text-xl">
-              تجربتك تصنع الفرق، شاركها، واستفد من تجارب الآخرين في مسار
-              الامتياز
+              تجربتك تفرق، شاركها، واستفد من تجارب الآخرين في مسار الامتياز
             </p>
-            <Button asChild className="w-full justify-center max-w-lg">
-              <a href="/experience-form"> شارك تجربتك</a>
-            </Button>
+            <div className="flex w-full max-w-lg flex-row gap-3">
+              <Button asChild className="flex-1 justify-center">
+                <a href="/experience-form">شارك تجربتك</a>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="flex-1 justify-center"
+              >
+                <a href="#experiences">
+                  <ArrowDown className=" size-4" />
+                  تصفح التجارب
+                </a>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
       <hr className="shadow-sm my-3" />
-      <section id="experiences" className=" p-4">
+      <section id="experiences" className="scroll-mt-4 p-4">
         <h2 className="text-2xl text-center font-bold ">أحدث التجارب</h2>
         <div className=" pt-6 justify-center mb-2 items-center flex flex-col  gap-3">
           <SearchForm />
