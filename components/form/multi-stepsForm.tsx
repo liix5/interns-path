@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   useForm,
   useFormContext,
@@ -132,6 +132,18 @@ const Step1 = ({
   const { control } = useFormContext();
   const [professionOpen, setProfessionOpen] = useState(false);
   const [cityOpen, setCityOpen] = useState(false);
+  const professionFieldRef = useRef<HTMLDivElement>(null);
+
+  const handleProfessionOpenChange = (open: boolean) => {
+    setProfessionOpen(open);
+    if (!open) return;
+    requestAnimationFrame(() => {
+      professionFieldRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  };
 
   return (
     <>
@@ -140,9 +152,16 @@ const Step1 = ({
         control={control}
         name="profession_id"
         render={({ field }) => (
-          <FormItem dir="rtl" className="w-full">
+          <FormItem
+            ref={professionFieldRef}
+            dir="rtl"
+            className="w-full scroll-mt-4"
+          >
             <FormLabel>التخصص</FormLabel>
-            <Popover open={professionOpen} onOpenChange={setProfessionOpen}>
+            <Popover
+              open={professionOpen}
+              onOpenChange={handleProfessionOpenChange}
+            >
               <PopoverTrigger asChild>
                 <FormControl>
                   <Button
@@ -168,7 +187,7 @@ const Step1 = ({
               >
                 <Command>
                   <CommandInput placeholder="ابحث عن تخصص..." className="h-9" />
-                  <CommandList>
+                  <CommandList className="max-h-[180px]">
                     <CommandEmpty>لم يتم العثور على تخصص.</CommandEmpty>
                     <CommandGroup>
                       {professions.map((p) => (
@@ -184,7 +203,9 @@ const Step1 = ({
                           <Check
                             className={cn(
                               "mr-auto h-4 w-4 rtl:ml-auto rtl:mr-0",
-                              field.value === p.id ? "opacity-100" : "opacity-0",
+                              field.value === p.id
+                                ? "opacity-100"
+                                : "opacity-0",
                             )}
                           />
                         </CommandItem>
@@ -239,7 +260,7 @@ const Step1 = ({
                     placeholder="ابحث عن مدينة..."
                     className="h-9"
                   />
-                  <CommandList>
+                  <CommandList className="max-h-[220px]">
                     <CommandEmpty>لم يتم العثور على مدينة.</CommandEmpty>
                     <CommandGroup>
                       {cities.map((c) => (
@@ -808,7 +829,7 @@ export default function ExperienceForm({
   return (
     <main
       dir="rtl"
-      className="w-full mt-11 flex items-center justify-center p-4"
+      className="w-full mt-11 flex items-center justify-center p-4 pb-24 sm:pb-4"
     >
       <div className="w-full max-w-2xl  ">
         <CardHeader className="flex flex-col items-center text-center">
