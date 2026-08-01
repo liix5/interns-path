@@ -44,6 +44,7 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandList,
 } from "@/components/ui/command";
 import {
   Popover,
@@ -157,30 +158,37 @@ const Step1 = ({
                   </Button>
                 </FormControl>
               </PopoverTrigger>
-              <PopoverContent className="w-full p-0" dir="rtl">
+              <PopoverContent
+                className="flex max-h-(--radix-popover-available-height) w-(--radix-popover-trigger-width) flex-col overflow-hidden p-0"
+                dir="rtl"
+                collisionPadding={12}
+                updatePositionStrategy="always"
+              >
                 <Command>
                   <CommandInput placeholder="ابحث عن تخصص..." className="h-9" />
-                  <CommandEmpty>لم يتم العثور على تخصص.</CommandEmpty>
-                  <CommandGroup className="max-h-[300px] overflow-auto">
-                    {professions.map((p) => (
-                      <CommandItem
-                        key={p.id}
-                        value={p.id}
-                        onSelect={() => {
-                          field.onChange(p.id);
-                          setProfessionOpen(false);
-                        }}
-                      >
-                        {p.name}
-                        <Check
-                          className={cn(
-                            "mr-auto h-4 w-4 rtl:ml-auto rtl:mr-0",
-                            field.value === p.id ? "opacity-100" : "opacity-0",
-                          )}
-                        />
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
+                  <CommandList>
+                    <CommandEmpty>لم يتم العثور على تخصص.</CommandEmpty>
+                    <CommandGroup>
+                      {professions.map((p) => (
+                        <CommandItem
+                          key={p.id}
+                          value={p.id}
+                          onSelect={() => {
+                            field.onChange(p.id);
+                            setProfessionOpen(false);
+                          }}
+                        >
+                          {p.name}
+                          <Check
+                            className={cn(
+                              "mr-auto h-4 w-4 rtl:ml-auto rtl:mr-0",
+                              field.value === p.id ? "opacity-100" : "opacity-0",
+                            )}
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
                 </Command>
               </PopoverContent>
             </Popover>
@@ -218,35 +226,42 @@ const Step1 = ({
                   </Button>
                 </FormControl>
               </PopoverTrigger>
-              <PopoverContent className="w-full p-0" dir="rtl">
+              <PopoverContent
+                className="flex max-h-(--radix-popover-available-height) w-(--radix-popover-trigger-width) flex-col overflow-hidden p-0"
+                dir="rtl"
+                collisionPadding={12}
+                updatePositionStrategy="always"
+              >
                 <Command>
                   <CommandInput
                     placeholder="ابحث عن مدينة..."
                     className="h-9"
                   />
-                  <CommandEmpty>لم يتم العثور على مدينة.</CommandEmpty>
-                  <CommandGroup className="max-h-[300px] overflow-auto">
-                    {cities.map((c) => (
-                      <CommandItem
-                        key={c.id}
-                        value={c.id}
-                        onSelect={() => {
-                          field.onChange(Number(c.id));
-                          setCityOpen(false);
-                        }}
-                      >
-                        {c.name_ar}
-                        <Check
-                          className={cn(
-                            "mr-auto h-4 w-4 rtl:ml-auto rtl:mr-0",
-                            field.value === Number(c.id)
-                              ? "opacity-100"
-                              : "opacity-0",
-                          )}
-                        />
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
+                  <CommandList>
+                    <CommandEmpty>لم يتم العثور على مدينة.</CommandEmpty>
+                    <CommandGroup>
+                      {cities.map((c) => (
+                        <CommandItem
+                          key={c.id}
+                          value={c.id}
+                          onSelect={() => {
+                            field.onChange(Number(c.id));
+                            setCityOpen(false);
+                          }}
+                        >
+                          {c.name_ar}
+                          <Check
+                            className={cn(
+                              "mr-auto h-4 w-4 rtl:ml-auto rtl:mr-0",
+                              field.value === Number(c.id)
+                                ? "opacity-100"
+                                : "opacity-0",
+                            )}
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
                 </Command>
               </PopoverContent>
             </Popover>
