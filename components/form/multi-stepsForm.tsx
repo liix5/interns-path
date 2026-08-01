@@ -46,6 +46,8 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { useFormDraft } from "@/hooks/useFormDraft";
+import { DraftBanner } from "@/components/ui/draft-banner";
 import {
   Popover,
   PopoverContent,
@@ -406,28 +408,7 @@ const Step2 = () => {
 
 // Step3
 const Step3 = () => {
-  const { control, setValue, watch } = useFormContext();
-  const text = watch("description"); // <-- now 'text' exists
-
-  useEffect(() => {
-    // Restore saved value once on mount
-    const saved = localStorage.getItem("description");
-    if (saved && !text) {
-      setValue("description", saved);
-    }
-
-    // Clear storage every 30 minutes (1800000 ms)
-    const interval = setInterval(
-      () => {
-        localStorage.removeItem("description");
-        console.log("LocalStorage cleared");
-      },
-      30 * 60 * 1000,
-    );
-
-    // Cleanup on unmount
-    return () => clearInterval(interval);
-  }, [setValue, text]);
+  const { control } = useFormContext();
 
   return (
     <>
@@ -444,7 +425,7 @@ const Step3 = () => {
             <FormControl>
               <Textarea
                 className="min-h-60"
-                placeholder="تحدث عن تجربتك بالتفصيل: 
+                placeholder="تحدث عن تجربتك بالتفصيل:
                 هل يتم تحديد أخصائي لكل طالب؟
 هل تمسك مرضى لحالك؟
 كيف تعامل الأخصائيين؟
@@ -455,9 +436,6 @@ const Step3 = () => {
  والمواقف والمطاعم؟
                 الخ..."
                 {...field}
-                onBlur={(e) =>
-                  localStorage.setItem("description", e.target.value)
-                }
               />
             </FormControl>
             <FormMessage />
@@ -690,6 +668,21 @@ export default function ExperienceForm({
   cities: City[];
 }) {
   const [currentStep, setCurrentStep] = useState(0);
+  const router = useRouter();
+
+  // Migrate old localStorage keys to new format (one-time cleanup)
+  useEffect(() => {
+    // Clean up old field-level draft
+    const oldDraft = localStorage.getItem("description");
+    if (oldDraft) {
+      localStorage.removeItem("description");
+    }
+    // Clean up old field-level draft format
+    const oldFieldDraft = localStorage.getItem("draft_experience_description");
+    if (oldFieldDraft) {
+      localStorage.removeItem("draft_experience_description");
+    }
+  }, []);
 
   const methods = useForm<ExperienceFormValues>({
     resolver: zodResolver(formSchema),
@@ -716,9 +709,22 @@ export default function ExperienceForm({
   const [loading, setLoading] = useState(false);
   const [allowSubmit, setAllowSubmit] = useState(false);
 
-  const { trigger, handleSubmit } = methods;
-  const CurrentComponent = formSteps[currentStep].component;
+  const { trigger, handleSubmit, watch, reset } = methods;
+  const formValues = watch();
   const isFinalStep = currentStep === formSteps.length - 1;
+
+  // Form-level draft storage
+  const formDraft = useFormDraft({
+    key: "experience_form",
+    formValues,
+    currentStep,
+    totalSteps: formSteps.length,
+    descriptionField: "description",
+    onRestore: (values, step) => {
+      reset(values);
+      setCurrentStep(step);
+    },
+  });
 
   // Enable submit only after user has been on final step
   useEffect(() => {
@@ -745,8 +751,6 @@ export default function ExperienceForm({
     setAllowSubmit(false);
     setCurrentStep((s) => s - 1);
   };
-
-  const router = useRouter();
 
   const onSubmit = async (data: any) => {
     if (!allowSubmit) return;
@@ -782,6 +786,9 @@ export default function ExperienceForm({
               JSON.stringify(editTokens),
             );
           }
+
+          // Clear form draft on successful submission
+          formDraft.clearDraft();
 
           methods.reset(); // ✅ clear form after success
           setCurrentStep(0); // ✅ reset to step 1 if you want
@@ -823,6 +830,21 @@ export default function ExperienceForm({
             ))}
           </div>
         </CardHeader>
+
+        {/* Draft restoration banner */}
+        {formDraft.showBanner && (
+          <div className="px-6 mb-4">
+            <DraftBanner
+              preview={formDraft.draftPreview}
+              currentStep={formDraft.draftStep}
+              totalSteps={formDraft.totalSteps}
+              onRestore={formDraft.restore}
+              onDiscard={formDraft.discard}
+              restoreLabel="متابعة من حيث توقفت"
+              discardLabel="بدء من جديد"
+            />
+          </div>
+        )}
 
         <FormProvider {...methods}>
           <Form {...methods}>
