@@ -6,6 +6,7 @@ import Footer from "@/components/main/footer";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Toaster } from "@/components/ui/sonner";
+import { FeedbackButton } from "@/components/main/feedbackButton";
 import type { Metadata } from "next";
 
 const inter = Inter({
@@ -110,6 +111,7 @@ export default function RootLayout({
           <NavBar />
           <main className="flex-grow">{children}</main>
           <Footer />
+          <FeedbackButton />
           <Toaster dir="rtl" />
         </ThemeProvider>
         <Analytics />

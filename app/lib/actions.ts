@@ -267,6 +267,16 @@ const ProfessionRequestSchema = z.object({
   source: z.string().optional(),
 });
 
+const FeedbackSchema = z.object({
+  type: z.enum(["suggestion", "complaint", "question", "general"]),
+  message: z.string().min(3, "الرسالة قصيرة جداً"),
+  email: z
+    .string()
+    .email("البريد الإلكتروني غير صالح")
+    .optional()
+    .or(z.literal("")),
+});
+
 export type ProfessionRequestState = {
   errors?: Record<string, string[]>;
   message?: string | null;
@@ -313,4 +323,71 @@ export async function sendProfessionRequest(
   }
 
   return { message: " تم إرسال طلبك بنجاح!" };
+}
+
+export type FeedbackState = {
+  errors?: Record<string, string[]>;
+  message?: string | null;
+};
+
+const feedbackTypeLabels: Record<string, string> = {
+  suggestion: "اقتراح",
+  complaint: "شكوى",
+  question: "سؤال",
+  general: "ملاحظة عامة",
+};
+
+export async function sendFeedback(
+  prevState: FeedbackState,
+  formData: FormData,
+): Promise<FeedbackState> {
+  const validatedFields = FeedbackSchema.safeParse({
+    type: formData.get("type"),
+    message: formData.get("message"),
+    email: formData.get("email") || "",
+  });
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "⚠️ يرجى تصحيح الأخطاء وإعادة المحاولة.",
+    };
+  }
+
+  const { type, message, email } = validatedFields.data;
+  const typeLabel = feedbackTypeLabels[type];
+
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: `"Interns Path" <${process.env.GMAIL_USER}>`,
+      to: "internspath@gmail.com",
+      replyTo: email || undefined,
+      subject: `[InternsPath] ${typeLabel}: New Feedback`,
+      text: `نوع الملاحظة: ${typeLabel}\n\nالرسالة:\n${message}\n\nالبريد للرد: ${email || "غير محدد"}\n\nالتاريخ: ${new Date().toLocaleString("ar-SA")}`,
+      html: `
+        <div dir="rtl" style="font-family: sans-serif;">
+          <h2>ملاحظة جديدة - ${typeLabel}</h2>
+          <p><strong>نوع الملاحظة:</strong> ${typeLabel}</p>
+          <p><strong>الرسالة:</strong></p>
+          <p style="background: #f5f5f5; padding: 12px; border-radius: 8px;">${message}</p>
+          <p><strong>البريد للرد:</strong> ${email || "غير محدد"}</p>
+          <p><small>التاريخ: ${new Date().toLocaleString("ar-SA")}</small></p>
+        </div>
+      `,
+    });
+
+    console.log("Feedback email sent successfully");
+  } catch (error) {
+    return { message: "❌ فشل إرسال الملاحظة: " + error };
+  }
+
+  return { message: "✅ تم إرسال ملاحظتك بنجاح!" };
 }

@@ -34,3 +34,11 @@ export type Profession = {
 export type ProfessionWithCount = Profession & {
   count: number;
 };
+
+import { z } from "zod";
+
+export const feedbackSchema = z.object({
+  type: z.enum(["suggestion", "complaint", "question", "general"]),
+  message: z.string().min(10, "الرسالة قصيرة جداً"),
+  email: z.string().email("البريد الإلكتروني غير صالح").optional().or(z.literal("")),
+});
