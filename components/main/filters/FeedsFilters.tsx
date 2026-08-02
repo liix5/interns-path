@@ -2,16 +2,18 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Profession } from "@/app/lib/definitions";
+import { ProfessionWithCount } from "@/app/lib/definitions";
 import ProfessionFilter from "./ProfessionFilter";
+import { useTransition } from "react";
 
 export default function FeedFilters({
   professions,
 }: {
-  professions: Profession[];
+  professions: ProfessionWithCount[];
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
   const handleSelect = (selectedIds: number[]) => {
     const params = new URLSearchParams(searchParams);
@@ -22,8 +24,10 @@ export default function FeedFilters({
 
     params.set("page", "1");
 
-    router.push(`/?${params.toString()}`);
+    startTransition(() => {
+      router.push(`/?${params.toString()}`);
+    });
   };
 
-  return <ProfessionFilter professions={professions} onSelect={handleSelect} />;
+  return <ProfessionFilter professions={professions} onSelect={handleSelect} isPending={isPending} />;
 }

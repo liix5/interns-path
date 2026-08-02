@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowDown, ArrowUpLeft } from "lucide-react";
 import ExperiencesFeed from "@/components/main/Experiences";
 import ExperienceCard from "@/components/Experience/ExperienceCard";
-import { fetchExperiencesPages, fetchProfessions } from "./lib/data";
+import { fetchExperiencesPages, fetchProfessionsWithCounts } from "./lib/data";
 import ProfessionFilter from "@/components/main/filters/ProfessionFilter";
 import FeedFilters from "@/components/main/filters/FeedsFilters";
 import SearchForm from "@/components/main/filters/SearchForm";
@@ -23,7 +23,7 @@ export default async function Home({
   const profession = searchParams.profession || "all";
   const search = searchParams.q || "";
 
-  const professions = await fetchProfessions();
+  const professions = await fetchProfessionsWithCounts();
   const allPages = await fetchExperiencesPages(profession, search);
 
   return (

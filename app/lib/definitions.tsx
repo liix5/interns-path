@@ -30,3 +30,7 @@ export type Profession = {
   id: string;
   name: string;
 };
+
+export type ProfessionWithCount = Profession & {
+  count: number;
+};

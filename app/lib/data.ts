@@ -19,6 +19,27 @@ export async function fetchProfessions(): Promise<Profession[]> {
     throw new Error("Failed to fetch professions.");
   }
 }
+
+export async function fetchProfessionsWithCounts(): Promise<
+  (Profession & { count: number })[]
+> {
+  try {
+    const data = await sql<(Profession & { count: number })[]>`
+      SELECT
+        p.id,
+        p.name,
+        COUNT(e.id)::int AS count
+      FROM professions p
+      LEFT JOIN experiences e ON p.id = e.profession_id
+      GROUP BY p.id, p.name
+      ORDER BY count DESC, p.name ASC
+    `;
+    return data;
+  } catch (err) {
+    console.error("Database Error:", err);
+    throw new Error("Failed to fetch professions with counts.");
+  }
+}
 // get the tags from the tags table
 export async function fetchTags(): Promise<string[]> {
   try {

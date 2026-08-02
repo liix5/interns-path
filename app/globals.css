@@ -190,3 +190,54 @@
     font-family: var(--font-arabic);
   }
 }
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+    -webkit-appearance: none;
+    width: 0;
+    height: 0;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  /* Thin, auto-hiding scrollbar - YouTube style (shows when scrolling, fades when idle) */
+  .scrollbar-thin {
+    scrollbar-width: thin; /* Firefox - native auto-hiding thin scrollbar */
+    scrollbar-color: oklch(0.5417 0.179 288.0332 / 0.35) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    height: 5px; /* Thin but visible */
+    width: 5px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: oklch(0.5417 0.179 288.0332 / 0.3); /* Semi-transparent - visible but subtle */
+    border-radius: 10px;
+    transition: background 0.2s ease;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.5417 0.179 288.0332 / 0.5); /* More opaque on hover */
+  }
+  .scrollbar-thin::-webkit-scrollbar-button {
+    display: none; /* Hide arrows */
+  }
+
+  /* Dark mode scrollbar */
+  .dark .scrollbar-thin {
+    scrollbar-color: oklch(0.7162 0.1597 290.3962 / 0.35) transparent;
+  }
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: oklch(0.7162 0.1597 290.3962 / 0.3);
+  }
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.7162 0.1597 290.3962 / 0.5);
+  }
+}
