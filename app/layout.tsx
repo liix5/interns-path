@@ -12,18 +12,21 @@ import type { Metadata } from "next";
 const inter = Inter({
   variable: "--font-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const newsreader = Newsreader({
   variable: "--font-serif",
   subsets: ["latin"],
   weight: "500",
+  display: "swap",
 });
 
 const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
   variable: "--font-arabic",
   subsets: ["arabic"],
   weight: ["400", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {

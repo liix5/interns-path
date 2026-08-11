@@ -40,7 +40,7 @@ export default function ExperienceCardPreview({
 
   return (
     <Card
-      className="w-full relative h-full shadow-sm rounded-xl border hover:shadow-md transition"
+      className="w-full relative h-full min-h-[280px] shadow-sm rounded-xl border hover:shadow-md transition"
       dir="rtl"
     >
       <CardHeader>

@@ -1,12 +1,6 @@
 // lib/data.ts
-import postgres, { Sql } from "postgres";
+import { sql } from "./db";
 import { Experience, Profession, City } from "./definitions";
-import { revalidatePath } from "next/cache";
-
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
-
-//development database
-// const sql = postgres(process.env.DevDB!, { ssl: "require" });
 
 const ITEMS_PER_PAGE = 30;
 

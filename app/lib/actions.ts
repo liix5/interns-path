@@ -1,15 +1,10 @@
 "use server";
 
 import { z } from "zod";
-import postgres from "postgres";
+import { sql } from "./db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import nodemailer from "nodemailer";
-
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
-
-// development database
-// const sql = postgres(process.env.DevDB!, { ssl: "require" });
 
 const ExperienceSchema = z.object({
   profession_id: z.string().min(1, "الرجاء اختيار التخصص"),

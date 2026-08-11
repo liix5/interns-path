@@ -2,29 +2,56 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowDown, ArrowUpLeft } from "lucide-react";
 import ExperiencesFeed from "@/components/main/Experiences";
-import ExperienceCard from "@/components/Experience/ExperienceCard";
 import { fetchExperiencesPages, fetchProfessionsWithCounts } from "./lib/data";
-import ProfessionFilter from "@/components/main/filters/ProfessionFilter";
 import FeedFilters from "@/components/main/filters/FeedsFilters";
 import SearchForm from "@/components/main/filters/SearchForm";
 import { Suspense } from "react";
-import Loading from "./loading";
 import Pagination from "@/components/main/pagination";
 import { ProfessionRequestForm } from "@/components/form/professionReqForm";
+
+// Lightweight skeleton for just the feed section
+function FeedSkeleton() {
+  return (
+    <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {[1, 2, 3, 4, 5, 6].map((i) => (
+        <div key={i} className="h-[280px] rounded-xl border bg-card animate-pulse">
+          <div className="p-6 space-y-4">
+            <div className="flex justify-between">
+              <div className="h-5 w-24 bg-muted rounded" />
+              <div className="h-4 w-32 bg-muted rounded" />
+            </div>
+            <div className="flex gap-2">
+              <div className="h-6 w-16 bg-muted rounded-full" />
+              <div className="h-6 w-20 bg-muted rounded-full" />
+            </div>
+            <div className="space-y-2">
+              <div className="h-4 w-full bg-muted rounded" />
+              <div className="h-4 w-full bg-muted rounded" />
+              <div className="h-4 w-3/4 bg-muted rounded" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default async function Home({
   searchParams,
 }: {
-  searchParams: { page?: string; profession?: string; q?: string | null };
+  searchParams: Promise<{ page?: string; profession?: string; q?: string | null }>;
 }) {
-  // REMOVE THIS LINE:
-  // await searchParams;
-  const page = searchParams.page ? Number(searchParams.page) : 1;
-  const profession = searchParams.profession || "all";
-  const search = searchParams.q || "";
+  // Next.js 15: searchParams is now a Promise
+  const params = await searchParams;
+  const page = params.page ? Number(params.page) : 1;
+  const profession = params.profession || "all";
+  const search = params.q || "";
 
-  const professions = await fetchProfessionsWithCounts();
-  const allPages = await fetchExperiencesPages(profession, search);
+  // Parallel data fetching - both queries run simultaneously
+  const [professions, allPages] = await Promise.all([
+    fetchProfessionsWithCounts(),
+    fetchExperiencesPages(profession, search),
+  ]);
 
   return (
     <div>
@@ -63,13 +90,14 @@ export default async function Home({
         <h2 className="text-2xl text-center font-bold ">أحدث التجارب</h2>
         <div className=" pt-6 justify-center mb-2 items-center flex flex-col  gap-3">
           <SearchForm />
+
+          <FeedFilters professions={professions} />
           <p className="text-sm text-center">
             لم تجد تخصصك؟ <ProfessionRequestForm source="الصفحة الرئيسية" />
           </p>
-          <FeedFilters professions={professions} />
         </div>
 
-        <Suspense key={page} fallback={<Loading />}>
+        <Suspense key={`${page}-${profession}-${search}`} fallback={<FeedSkeleton />}>
           <ExperiencesFeed
             totalPages={allPages}
             page={page}

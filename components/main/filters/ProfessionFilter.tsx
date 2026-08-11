@@ -62,7 +62,7 @@ export default function ProfessionFilter({
   const isAllSelected = selected.length === 0;
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full min-h-[44px]">
       {/* Loading indicator */}
       {isPending && (
         <div className="absolute inset-0 bg-background/50 backdrop-blur-[2px] z-10 flex items-center justify-center rounded-lg">
